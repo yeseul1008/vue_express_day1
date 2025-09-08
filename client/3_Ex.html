@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
+    <style>
+    table, tr, td, th{
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 5px 10px;
+        text-align: center; 
+    }
+    th{
+        background-color: beige;
+    }
+    tr:nth-child(even){
+        background-color: azure;
+    }
+</style>
+</head>
+<body>
+    <div id="app"> <!--html 코드는 id가 app인 태그 안에서 작업-->
+        {{jsonList[0].name}} <!--홍길동 출력-->
+
+        <!-- 일일히 출력하면 귀찮으니 반복문 이용해서 모든 벨류 값 출력하는법 -->
+        <div v-for="item in strlist"> <!--반복하면서 item이라는 변수에 담김-->
+           {{item}}
+        </div>
+        <div v-for="(item, index) in strlist"> <!-- 인덱스도 받아올수있음-->
+           {{index+1.}} {{item}}
+        </div>
+
+        <div v-for="item in jsonList">
+            {{item.name}}, {{item.age}}
+        </div>
+
+        <table>
+            <tr>
+                <th>이름</th>
+                <th>이름2</th>
+                <th>나이</th>
+                <th>주소</th>
+            </tr>
+            <tr v-for="item in jsonList">
+                <td><a href="javascript:;" @click="fnIntro(item.name, item.age, item.addr)">{{item.name}}</a></td>
+                <td><a href="javascript:;" @click="fnIntro2(item)">{{item.name}}</a></td>
+                <td>{{item.age}}</td>
+                <td>
+                    <!-- bind class를 이용하면 더 쉽게 가능 -->
+                    <span v-if="item.age>=25" style="color: blue;">{{item.addr}}</span>
+                    <span v-else>{{item.addr}}</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return { // 변수 선언
+                // 변수 - (key : value)
+                strlist : ["자바", "오라클", "html", "jquery"],
+
+                jsonList : [ // jsonList: 리스트 안에 맵이 담긴 형태
+                    {"name" : "홍길동", age : 30, addr : "인천"},
+                    {"name" : "김철수", age : 25, addr : "서울"},
+                    {"name" : "박영희", age : 20, addr : "제주도"}
+                ]
+            };
+        },
+        methods: {
+            // 함수(메소드) - (key : function())
+            fnUserList: function () {
+                let self = this;
+                $.ajax({
+                    url: "",
+                    dataType: "json",
+                    type: "GET",
+                    data: {},
+                    success: function (data) {
+
+                    }
+                });
+            },
+        fnIntro : function (name, age, addr) {
+            alert(`${name}님의 나이는 ${age}, 주소는 ${addr} 입니다`)
+        },
+        fnIntro2 : function (info) {
+            // 맵만 가져온거기 때문에 위 함수처럼 바로 변수를 불러올 수 없음
+            // 키 값으로 꺼내와야 함
+            alert(`${info.name}님의 나이는 ${info.age}, 주소는 ${info.addr} 입니다`)
+        }
+        }, // methods
+        mounted() {
+            // 처음 시작할 때 실행되는 부분
+        }
+    });
+
+    app.mount('#app');
+</script>
