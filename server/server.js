@@ -51,7 +51,7 @@ app.get('/emp/list', async (req, res) => { // /emp/list: 주소 이름
       return obj;
     });
     // 리턴 (맵 형태로)
-    res.json({
+    res.json({ // 코드가 성공적으로 실행됐을때 이 코드를 보내줌
         result : "success",
         empList : rows // 해당 이름으로 value를 보내줌
     });
@@ -61,16 +61,16 @@ app.get('/emp/list', async (req, res) => { // /emp/list: 주소 이름
   }
 });
 
-app.get('/stu/insert', async (req, res) => {
-  const { stuNo, name, dept } = req.query; // 파라미터 값 보내줌
+app.get('/emp/delete', async (req, res) => {
+  const { empNo } = req.query; // 파라미터 값 받아줌
 
   try {
     await connection.execute(
-      `INSERT INTO STUDENT (STU_NO, STU_NAME, STU_DEPT) VALUES (:stuNo, :name, :dept)`,
-      [stuNo, name, dept], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      `DELETE FROM EMP WHERE EMPNO = :empNo`,
+      [empNo], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
       { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
     );
-    res.json({
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
         result : "success"
     });
   } catch (error) {
@@ -79,7 +79,48 @@ app.get('/stu/insert', async (req, res) => {
   }
 });
 
+app.get('/prof/list', async (req, res) => { 
+  const { } = req.query;
+  try {
+    const result = await connection.execute(`SELECT * FROM PROFESSOR`);
+    const columnNames = result.metaData.map(column => column.name);
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    // 리턴 (맵 형태로)
+    res.json({ // 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+        result : "success",
+        profList : rows // 해당 이름으로 value를 보내줌
+    });
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
+  }
+});
 
+app.get('/prof/delete', async (req, res) => {
+  const { profNo } = req.query; // 파라미터 값 보내줌
+
+  try {
+    await connection.execute(
+      `DELETE FROM PROFESSOR WHERE PROFNO = :profNo`,
+      [profNo], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+        result : "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
 
 // 서버 시작
 app.listen(3009, () => {
