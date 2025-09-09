@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        table,
+        tr,
+        td,
+        th {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: beige;
+        }
+
+        tr:nth-child(even) {
+            background-color: azure;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"> <!--html 코드는 id가 app인 태그 안에서 작업-->
+        <div id="chart"></div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return { // 변수 선언
+                // 변수 - (key : value)
+                options: {
+                    series: [{
+                        name: 'Inflation',
+                        data: []
+                    }],
+                    chart: {
+                        height: 350,
+                        type: 'bar',
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 10,
+                            dataLabels: {
+                                position: 'top', // top, center, bottom
+                            },
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function (val) {
+                            return val + "$";
+                        },
+                        offsetY: -20,
+                        style: {
+                            fontSize: '12px',
+                            colors: ["#304758"]
+                        }
+                    },
+
+                    xaxis: {
+                        categories: [],
+                        position: 'top',
+                        axisBorder: {
+                            show: false
+                        },
+                        axisTicks: {
+                            show: false
+                        },
+                        crosshairs: {
+                            fill: {
+                                type: 'gradient',
+                                gradient: {
+                                    colorFrom: '#D8E3F0',
+                                    colorTo: '#BED1E6',
+                                    stops: [0, 100],
+                                    opacityFrom: 0.4,
+                                    opacityTo: 0.5,
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                        }
+                    },
+                    yaxis: {
+                        axisBorder: {
+                            show: false
+                        },
+                        axisTicks: {
+                            show: false,
+                        },
+                        labels: {
+                            show: false,
+                            formatter: function (val) {
+                                return val + "%";
+                            }
+                        }
+
+                    },
+                    title: {
+                        text: 'Monthly Inflation in Argentina, 2002',
+                        floating: true,
+                        offsetY: 330,
+                        align: 'center',
+                        style: {
+                            color: '#444'
+                        }
+                    }
+                }
+            };
+        },
+        methods: {
+            // 함수(메소드) - (key : function())
+            fnEmpList: function () {
+                let self = this;
+                $.ajax({
+                    url: "http://localhost:3009/emp/list", // 호출 할 서버 주소
+                    dataType: "json",
+                    type: "GET",
+                    data: { deptNo: self.deptNo },
+                    success: function (data) { // 서버에서 보내준 값은 data에 담김
+                        console.log(data); // 디비에서 가져온 리스트
+
+                        let list = data.empList;
+                        // text에 접근하는법
+                        // self.options.xaxis.categories = []; // 값초기화
+                        // self.options.series[0].data = []; //값 초기화
+
+                        let salList = [];
+                        let nameList = [];
+                        // for문으로 값 넣기
+                        for (var i = 0; i < list.length; i++) {
+                            salList.push(list[i].SAL); // 이름
+                            nameList.push(list[i].ENAME);     // 급여
+                        }
+                        self.options.series[0].data = salList;
+                        self.options.xaxis.categories = nameList;
+                        // 타이틀 바꾸기
+                        self.options.title.text = "부서별 직원 급여";
+
+                        // option에서 원하는 데이터 넣은 후 차트를 그려야하기 때문에 mounted 말고 이곳에 넣기
+                        var chart = new ApexCharts(document.querySelector("#chart"), self.options);
+                        chart.render();
+                    }
+                });
+            }
+        }, // methods
+        mounted() {
+            // 처음 시작할 때 실행되는 부분
+            let self = this;
+            self.fnEmpList();
+        }
+    });
+
+    app.mount('#app');
+</script>

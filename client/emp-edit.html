@@ -37,8 +37,13 @@
             <tr>
                 <th>사번</th>
                 <td>
+                    <span v-if="empNo == ''"> <!--추가화면에서는 보여지고-->
                     <input type="text" v-model="info.empNo">
                     <button class="check-btn">중복체크</button>
+                    </span>
+                    <span v-else> <!--empNo가 채워져있을때는 디스어블하게-->
+                        <input type="text" v-model="info.empNo" disabled>
+                    </span>
                 </td>
                 
             </tr>
@@ -61,7 +66,8 @@
                 </tr>
         </table>
         <div>
-            <button @click="fnAdd()">추가</button>
+            <button @click="fnAdd()" v-if="empNo == ''">추가</button>
+            <button @click="fnEdit()" v-else>수정</button>
         </div>
     </div>
 </body>
@@ -73,7 +79,7 @@
             return { // 변수 선언
                 // 변수 - (key : value)
                 info : {selectDept : "10" },// 처음에 선택되있게
-                empNo : ""
+                empNo : "" // 받아줄 사번 변수 만들기
             };
 
         },
@@ -96,17 +102,31 @@
                     }
                 });
             },
-            fnInfo: function () {
+            fnInfo: function () { // 저장되었던 정보 불러오기
                 let self = this;
                 
                 $.ajax({
-                    url: "http://localhost:3009/emp/info",
+                    url: "http://localhost:3009/emp/info", 
                     dataType: "json",
                     type: "GET",
-                    data: {empNo : self.empNo}, 
+                    data: {empNo : self.empNo}, // 조회 할 사번 보내주기 empNo라는 이름으로 self를 통해 조회한 값 담아서 보냄
                     success: function (data) { // 서버에서 보내준값은 data에 담겨온다
                         console.log(data);
-                        self.info = data.info; // 바로 담기
+                        self.info = data.info; // 서버에서 받아온 직원 정보 바로 담기
+                    }
+                });
+            },
+            fnEdit : function(){
+                let self = this;
+                let param = self.info; //인포 자체가 맵이니까
+                $.ajax({
+                    url: "http://localhost:3009/emp/update",
+                    dataType: "json",
+                    type: "GET",
+                    data: param,
+                    success: function (data) { // 서버에서 보내준값은 data에 담겨온다
+                        alert("수정되었습니다");
+                        location.href="emp-list.html";
                     }
                 });
             }

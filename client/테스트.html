@@ -1,0 +1,60 @@
+<div id="app">
+  <input 
+    type="text" 
+    v-model="searchText" 
+    @input="onInput" 
+    placeholder="단어를 입력하세요" 
+  >
+
+  <!-- 추천어 목록 -->
+  <ul v-if="filteredWords.length > 0" class="suggest-box">
+    <li v-for="(word, index) in filteredWords" :key="index" @click="selectWord(word)">
+      {{ word }}
+    </li>
+  </ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    searchText: '',
+    words: ['사과', '바나나', '포도', '딸기', '수박', '참외'], // DB에서 가져올 데이터 대신 예시
+    filteredWords: []
+  },
+  methods: {
+    onInput() {
+      const text = this.searchText.trim();
+      if (text.length > 0) {
+        this.filteredWords = this.words.filter(word =>
+          word.includes(text)   // 포함 여부 체크
+        );
+      } else {
+        this.filteredWords = [];
+      }
+    },
+    selectWord(word) {
+      this.searchText = word; // 클릭하면 input에 반영
+      this.filteredWords = []; // 목록 닫기
+    }
+  }
+});
+</script>
+
+<style>
+.suggest-box {
+  border: 1px solid #ccc;
+  max-width: 200px;
+  margin-top: 5px;
+  padding: 0;
+  list-style: none;
+}
+.suggest-box li {
+  padding: 5px;
+  cursor: pointer;
+}
+.suggest-box li:hover {
+  background: #f0f0f0;
+}
+</style>

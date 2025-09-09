@@ -7,6 +7,9 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
     <style>
+        #app{
+            margin: 50px;
+        }
         table, tr, td, th{
             border: 1px solid black;
             border-collapse: collapse;
@@ -19,12 +22,27 @@
         tr:nth-child(even){
             background-color: azure;
         }
+        #dept-menu{
+            margin-bottom: 10px;
+            text-align: center;
+            height: 30px;
+        }
     </style>
 </head>
 <body>
     <div id="app"> <!--html 코드는 id가 app인 태그 안에서 작업-->
+        <div>
+            <select id="dept-menu" v-model="deptNo" @change="fnEmpList()"> <!--선택한 값 브이모델에 저장-->
+                <option value="">:: 전체 ::</option> <!--@change= 는 셀렉트 선택할때마다 해당 함수 바로 실행-->
+                <option value="10">:: ACCOUNTING ::</option>
+                <option value="20">:: RESEARCH ::</option>
+                <option value="30">:: SALES ::</option>
+                <option value="40">:: OPERATING ::</option>
+            </select>
+        </div>
         <table>
             <tr>
+                <th>선택</th>
                 <th>사번</th>
                 <th>이름</th>
                 <th>직책</th>
@@ -34,8 +52,9 @@
                 <th>삭제</th>
             </tr>
             <tr v-for="item in list">
+                <td><input type="checkbox" :value="item.EMPNO" v-model="selectItems"></td> <!--:를 붗여주면 동적 처리 가능-->
                 <td>{{item.EMPNO}}</td>
-                <td>{{item.ENAME}}</td>
+                <td><a href="javascript:;" @click="fnView(item.EMPNO)">{{item.ENAME}}</a></td>
                 <td>{{item.JOB}}</td>
                 <td>{{item.SAL}}</td>
                 <td>{{item.DNAME}}</td>
@@ -45,6 +64,7 @@
         </table>
         <div>
             <a href="emp-edit.html"><button>추가</button></a>
+            <button @click="fnRemoveAll()">선택삭제</button>
         </div>
         
     </div>
@@ -56,7 +76,9 @@
         data() {
             return { // 변수 선언
                 // 변수 - (key : value)
-                list :[]
+                list :[],
+                deptNo : "", // select에서 고른 값 저장
+                selectItems : []
             };
         },
         methods: {
@@ -67,7 +89,7 @@
                     url: "http://localhost:3009/emp/list", // 호출 할 서버 주소
                     dataType: "json",
                     type: "GET",
-                    data: {},
+                    data: {deptNo : self.deptNo},
                     success: function (data) { // 서버에서 보내준 값은 data에 담김
                         console.log(data);
                         self.list = data.empList; // data에 있는 리스트를 전역변수에 담기
@@ -94,6 +116,29 @@
             },
             fnEdit :function(empNo){
                 location.href="emp-edit.html?empNo="+empNo;
+            },
+            fnView :function(empNo){
+                window.open(`emp-view.html?empNo=${empNo}`, "view,", "width=500","height=500");
+            },
+            fnRemoveAll : function (){
+                let self = this;
+                console.log(self.selectItems);
+                if(!confirm("정말 삭제??")){
+                    return;
+                }
+                $.ajax({
+                    url: "http://localhost:3009/emp/deleteAll", // 호출 할 서버 주소
+                    dataType: "json",
+                    type: "GET",
+                    data: {removeList : self.selectItems}, // 서버에 보낼 변수
+                    traditional : true, // 파라미터로 리스트를 보내려면 이 코드가 필요함
+                    success: function (data) { 
+                        if(data.result == "success"){
+                            alert("삭제되었습니다!")
+                            self.fnEmpList(); // 바로 새로고침을 위해 리스트 호출
+                        }
+                    }
+                });
             }
         }, // methods
         mounted() {

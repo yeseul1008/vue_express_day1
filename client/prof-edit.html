@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
+    <style>
+        #app{
+            width: 600px;
+            margin: 30px auto;
+        }
+        table, tr, td, th{
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px 10px;
+            text-align: center; 
+        }
+        th{
+            background-color: beige;
+            width: 150px;
+        }
+
+        td{
+            width: 300px;
+            text-align: left;
+        }
+        .check-btn{
+            margin-left:15px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"> <!--html 코드는 id가 app인 태그 안에서 작업-->
+        <table>
+            <tr>
+                <th>교수번호</th>
+                <td>
+                    <input type="text" v-model="info.profNo" disabled>
+                </td>
+            </tr>
+            <tr>
+                <th>이름</th>
+                <td><input type="text" v-model="info.profName"></td>
+            </tr>
+            <tr>
+                <th>아이디</th>
+                <td><input type="text" v-model="info.profId"></td>
+            </tr>
+            <tr>
+                <th>직급</th>
+                
+                    <td><input type="text" v-model="info.profPs"></td>
+            </tr>
+            <tr>
+                <th>급여</th>
+                
+                    <td><input type="text" v-model="info.profPay"></td>
+            </tr>
+        </table>
+        <div>
+            <button @click="fnEdit()">수정</button>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return { // 변수 선언
+                // 변수 - (key : value)
+                profNo : "",
+                info : ""
+            };
+        },
+        methods: {
+            // 함수(메소드) - (key : function())
+            fnInfo: function () {
+                let self = this;
+                let param = {profNo : self.profNo};
+                $.ajax({
+                    url: "http://localhost:3009/prof/info",
+                    dataType: "json",
+                    type: "GET",
+                    data: param,
+                    success: function (data) { // 서버에서 보내준값은 data에 담겨온다
+                        console.log(data);
+                        self.info = data.info; // 바로 담기
+                    }
+                });
+            },
+            fnEdit : function(){
+                let self = this;
+                let param = self.info;;
+                $.ajax({
+                    url: "http://localhost:3009/prof/update",
+                    dataType: "json",
+                    type: "GET",
+                    data: param,
+                    success: function (data) { // 서버에서 보내준값은 data에 담겨온다
+                        console.log(data);
+                        self.info = data.info; // 바로 담기
+                        alert("수정되었습니다.");
+                        location.href="prof-list.html"
+                    }
+                });
+            }
+        }, // methods
+        mounted() {
+            // 처음 시작할 때 실행되는 부분
+            let self = this;
+            const queryParams = new URLSearchParams(window.location.search); //받아온 교수번호를 변수에 저장
+            self.profNo = queryParams.get('profNo') || ''; //profNo라는 변수에 바로 담기게 됨
+       
+                self.fnInfo(); // 조화 하는 함수 바로 실행
+
+        }
+    });
+
+    app.mount('#app');
+</script>

@@ -37,9 +37,13 @@ app.get('/', (req, res) => {
 });
 
 app.get('/emp/list', async (req, res) => { // /emp/list: 주소 이름
-  const { } = req.query;
+  const { deptNo } = req.query;
+  let query = "";
+  if (deptNo != null && deptNo != "") {// ""도아니고 null도 아닐떄 실행해야하니까
+    query += `WHERE E.DEPTNO = ${deptNo}` // deptNo에 값이 없으면 ""만 담기고
+  }
   try {
-    const result = await connection.execute(`SELECT * FROM EMP E LEFT JOIN DEPT D ON E.DEPTNO = D.DEPTNO ORDER BY SAL DESC`);
+    const result = await connection.execute(`SELECT * FROM EMP E LEFT JOIN DEPT D ON E.DEPTNO = D.DEPTNO ${query} ORDER BY SAL DESC`);
     const columnNames = result.metaData.map(column => column.name);
     // 쿼리 결과를 JSON 형태로 변환
     const rows = result.rows.map(row => {
@@ -52,8 +56,8 @@ app.get('/emp/list', async (req, res) => { // /emp/list: 주소 이름
     });
     // 리턴 (맵 형태로)
     res.json({ // 코드가 성공적으로 실행됐을때 이 코드를 보내줌
-        result : "success",
-        empList : rows // 해당 이름으로 value를 보내줌
+      result: "success",
+      empList: rows // 해당 이름으로 value를 보내줌
     });
   } catch (error) {
     console.error('Error executing query', error);
@@ -61,10 +65,15 @@ app.get('/emp/list', async (req, res) => { // /emp/list: 주소 이름
   }
 });
 
-app.get('/emp/info', async (req, res) => { // /emp/list: 주소 이름
+app.get('/emp/info', async (req, res) => {
   const { empNo } = req.query;
   try {
-    const result = await connection.execute(`SELECT E.*, EMPNO "empNo", ENAME "eName", JOB "job", DEPTNO "selectDept" FROM EMP E WHERE EMPNO = ${empNo}`); // 해당 사번을 가진사람의 정보 리턴
+    const result = await connection.execute(
+      `SELECT E.*, DNAME, EMPNO "empNo", ENAME "eName", JOB "job", E.DEPTNO "selectDept" `
+      + `FROM EMP E `
+      + `INNER JOIN DEPT D ON E.DEPTNO = D.DEPTNO `
+      + `WHERE EMPNO = ${empNo}`
+    );
     const columnNames = result.metaData.map(column => column.name);
     // 쿼리 결과를 JSON 형태로 변환
     const rows = result.rows.map(row => {
@@ -75,10 +84,10 @@ app.get('/emp/info', async (req, res) => { // /emp/list: 주소 이름
       });
       return obj;
     });
-    // 리턴 (맵 형태로)
-    res.json({ // 코드가 성공적으로 실행됐을때 이 코드를 보내줌
-        result : "success",
-        info : rows[0]
+    // 리턴
+    res.json({
+      result: "success",
+      info: rows[0]
     });
   } catch (error) {
     console.error('Error executing query', error);
@@ -96,7 +105,7 @@ app.get('/emp/delete', async (req, res) => {
       { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
     );
     res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
-        result : "success"
+      result: "success"
     });
   } catch (error) {
     console.error('Error executing insert', error);
@@ -104,7 +113,88 @@ app.get('/emp/delete', async (req, res) => {
   }
 });
 
-app.get('/prof/list', async (req, res) => { 
+app.get('/emp/deleteAll', async (req, res) => {
+  const { removeList } = req.query; // 파라미터 값 받아줌
+  console.log(removeList);
+  let query = "DELETE FROM EMP WHERE EMPNO IN(";
+  for (let i = 0; i < removeList.length; i++) {
+    query += removeList[i];
+    if (removeList.length - 1 != i) {
+      query += ","; //마지막 값이 아닐때만 반점 붙임
+    }
+  }
+  query += ")";
+
+  try {
+
+    await connection.execute(
+      query,
+      [], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+
+app.get('/prof/deleteAll', async (req, res) => {
+  const { removeList } = req.query; // 파라미터 값 받아줌
+  console.log(removeList);
+  let query = "DELETE FROM PROFESSOR WHERE PROFNO IN(";
+  for (let i = 0; i < removeList.length; i++) {
+    query += removeList[i];
+    if (removeList.length - 1 != i) {
+      query += ","; //마지막 값이 아닐때만 반점 붙임
+    }
+  }
+  query += ")";
+
+  try {
+
+    await connection.execute(
+      query,
+      [], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+
+app.get('/prof/info', async (req, res) => {
+  const { profNo } = req.query; // 사번 받아주고 
+  try { // where절을 통해 해당 사번 불러오기
+    const result = await connection.execute(`SELECT P.*, PROFNO "profNo", NAME "profName", ID "profId", POSITION "profPs", PAY "profPay" FROM PROFESSOR P WHERE PROFNO = ${profNo}`); // 해당 사번을 가진사람의 정보 리턴
+    const columnNames = result.metaData.map(column => column.name);
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    // 리턴 (맵 형태로)
+    res.json({ // 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success",
+      info: rows[0]
+    });
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
+  }
+});
+
+app.get('/prof/list', async (req, res) => {
   const { } = req.query;
   try {
     const result = await connection.execute(`SELECT * FROM PROFESSOR`);
@@ -120,8 +210,8 @@ app.get('/prof/list', async (req, res) => {
     });
     // 리턴 (맵 형태로)
     res.json({ // 코드가 성공적으로 실행됐을때 이 코드를 보내줌
-        result : "success",
-        profList : rows // 해당 이름으로 value를 보내줌
+      result: "success",
+      profList: rows // 해당 이름으로 value를 보내줌
     });
   } catch (error) {
     console.error('Error executing query', error);
@@ -139,7 +229,25 @@ app.get('/prof/delete', async (req, res) => {
       { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
     );
     res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
-        result : "success"
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+
+app.get('/prof/update', async (req, res) => {
+  const { profName, profId, profPs, profPay, profNo } = req.query; // 파라미터 값 보내줌
+
+  try {
+    await connection.execute(
+      `UPDATE PROFESSOR SET NAME = :profName, ID = :profId, POSITION = :profPs, PAY = :profPay WHERE PROFNO = :profNo`,
+      [profName, profId, profPs, profPay, profNo], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
     });
   } catch (error) {
     console.error('Error executing insert', error);
@@ -157,7 +265,25 @@ app.get('/emp/insert', async (req, res) => {
       { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
     );
     res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
-        result : "success"
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+
+app.get('/emp/update', async (req, res) => {
+  const { empNo, eName, job, selectDept } = req.query; // 파라미터 값 보내줌
+
+  try {
+    await connection.execute(
+      `UPDATE EMP SET ENAME = :eName, JOB = :job, DEPTNO = :selectDept WHERE EMPNO = :empNo`,
+      [eName, job, selectDept, empNo], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
     });
   } catch (error) {
     console.error('Error executing insert', error);
