@@ -290,7 +290,82 @@ app.get('/emp/update', async (req, res) => {
     res.status(500).send('Error executing insert');
   }
 });
+app.get('/board/list', async (req, res) => {
+  const { pageSize, offset } = req.query;
 
+  try {
+    const result = await connection.execute(
+      `SELECT B.*, TO_CHAR(CDATETIME, 'YYYY-MM-DD') AS CDATE FROM TBL_BOARD B `
+      + `OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`
+    );
+    const columnNames = result.metaData.map(column => column.name);
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    const count = await connection.execute( // 게시글 전체 개수 세는 쿼리
+      `SELECT COUNT(*) FROM TBL_BOARD B`
+    );
+    console.log(count); // rows의 리스트의 0번째에 담김
+    console.log(count.rows[0][0]); // 개수만 꺼내오기
+
+    // 리턴
+    res.json({
+      result: "success",
+      boardList: rows,
+      count : count.rows[0][0] // 게시글 개수
+    });
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
+  }
+});
+app.get('/board/add', async (req, res) => {
+  const { title, contents, userId, kind } = req.query; // 파라미터 값 보내줌
+
+  try {
+    await connection.execute(
+      `INSERT INTO TBL_BOARD VALUES (B_SEQ.NEXTVAL, :title, :contents, :userId, 0, 0 , :kind, SYSDATE, SYSDATE)`,
+      [title, contents, userId, kind], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+app.get('/board/info', async (req, res) => {
+  const { boardNo } = req.query; // 사번 받아주고 
+  try { // where절을 통해 해당 사번 불러오기
+    const result = await connection.execute(`SELECT B.*, TO_CHAR(CDATETIME, 'YYYY-MM-DD') CTIME FROM TBL_BOARD B WHERE BOARDNO =${boardNo}`); // 해당 사번을 가진사람의 정보 리턴
+    const columnNames = result.metaData.map(column => column.name);
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    // 리턴 (맵 형태로)
+    res.json({ // 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success",
+      info: rows[0] //0번쨰꺼만 리턴하도록 미리 정의
+    });
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
+  }
+});
 // 서버 시작
 app.listen(3009, () => {
   console.log('Server is running on port 3009');
