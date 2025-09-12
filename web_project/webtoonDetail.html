@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
+
+    <style>
+        /* 기본 스타일 초기화 */
+        * {
+
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        @font-face {
+            font-family: 'KboDiamondGothic';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_light.woff') format('woff');
+            font-weight: 300;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'KboDiamondGothic';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_medium.woff') format('woff');
+            font-weight: 500;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'KboDiamondGothic';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_bold.woff') format('woff');
+            font-weight: 700;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'JoseonGulim';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunGu.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+
+        /* 로그인 바 */
+        #top-bar {
+            background-color: #edf1f5;
+            color: #fff;
+            height: 40px;
+            display: flex;
+            align-items: center;
+
+            /* 로그인 버튼 오른쪽 끝 */
+            padding: 0 20px;
+            font-size: 14px;
+            box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.288);
+            position: relative;
+            z-index: 10;
+        }
+
+        /*로그인, 회원가입 버튼*/
+        #top-bar button {
+            justify-content: flex-end;
+            font-family: 'JoseonGulim';
+            background-color: #fff;
+            color: #0145f2;
+            border: 2px solid #0145f2;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-left: 5px;
+        }
+
+
+        #top-bar button:hover {
+            background-color: #0145f2;
+            color: #edf1f5;
+        }
+
+        #ment {
+            text-align: left;
+            color: #0145f2;
+            flex-grow: 1;
+            font-family: 'JoseonGulim';
+            font-size: 20px;
+        }
+
+        /* 상단바 */
+        #blue-bar {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            /* 깔끔한 현대적 파란색 */
+            height: 320px;
+            font-size: 60px;
+            box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.548);
+            position: relative;
+            z-index: 5;
+            padding-top: 50px;
+            display: flex;
+            /* flex 컨테이너 */
+            flex-direction: column;
+            /* 위에서 아래로 쌓이도록 */
+            align-items: center;
+            /* 가로 중앙 정렬 */
+            padding-top: 50px;
+            /* 글씨 위 여백 */
+
+        }
+
+        #blue-bar .title {
+            font-family: 'KboDiamondGothic';
+            color: #edf1f5;
+            text-align: center;
+
+        }
+
+        #blue-bar .info {
+            margin-top: 15px;
+            color: #edf1f5;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        #blue-bar .info div {
+            font-family: 'JoseonGulim';
+            margin-bottom: 8px;
+        }
+
+        #blue-bar button {
+            font-family: 'JoseonGulim';
+            background-color: #edf1f5;
+            color: #0145f2;
+            padding: 15px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-left: 5px;
+            border: none;
+            margin: 0px auto;
+            margin-top: 20px;
+            font-size: 30px;
+        }
+
+        #blue-bar button:hover {
+            background-color: #b1b2b4;
+            color: #edf1f5;
+            border: #edf1f5 solid 2px;
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+        }
+
+        /* 반응형 처리 */
+        @media (max-width: 600px) {
+            .blue-bar {
+                font-size: 16px;
+                height: 50px;
+            }
+
+            .top-bar button {
+                padding: 4px 10px;
+                font-size: 13px;
+            }
+        }
+        
+    
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="top-bar">
+            <div id="ment">웹툰 리뷰 통합 사이트</div>
+            <div v-if="!sessionUserId">
+                <button>회원가입</button>
+                <a href="login.html"><button>로그인</button></a>
+            </div>
+            <div v-else>
+                <button>마이페이지</button>
+                <button @click="fnLogout">로그아웃</button>
+            </div>
+        </div>
+
+        <div id="blue-bar">
+            <div class="title">웹사이트 이름</div>
+            <div class="info">
+                <div v-if="!sessionUserId">
+                    <div>리뷰 등록은 로그인 후 이용가능합니다 </div>
+
+                </div>
+                <div v-else>
+                    <div>닉네임: {{sessionName}} </div>
+                    <div>등록한 리뷰 수:</div>
+                </div>
+            </div>
+            <button class="reviewButton">리뷰추가</button>
+        </div>
+        
+
+        <div class="content">
+           
+        </div>
+
+    </div>
+
+
+</body>
+
+</html>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                webtoonList: [],
+                sessionUserId: "",
+                sessionName: ""
+            };
+        },
+        methods: {
+            // 웹툰 목록 불러오기
+            fnList() {
+                let self = this;
+                $.ajax({
+                    url: "http://localhost:3009/web/list",
+                    dataType: "json",
+                    type: "GET",
+                    success: function (data) {
+                        self.webtoonList = data.webtoonlist;
+                        console.log("웹툰 목록 불러오기 성공", self.webtoonList);
+                    },
+                    error: function (err) {
+                        console.error("웹툰 목록 불러오기 실패", err);
+                    }
+                });
+            },
+            // 로그아웃
+            fnLogout() {
+                if (confirm("로그아웃 하시겠습니까?")) {
+                    sessionStorage.removeItem("sessionId");
+                    sessionStorage.removeItem("sessionStatus");
+                    alert("로그아웃 되었습니다!");
+                    location.href = "webmain.html";
+                }
+            },
+            // 상세 페이지 이동
+            
+        },
+        mounted() {
+            this.fnList();
+            this.sessionUserId = sessionStorage.getItem("sessionId");
+            this.sessionName = sessionStorage.getItem("sessionName");
+            console.log("세션 아이디:", this.sessionUserId);
+            console.log("세션 닉네임:", this.sessionName);
+        }
+    });
+
+    app.mount('#app');
+
+</script>

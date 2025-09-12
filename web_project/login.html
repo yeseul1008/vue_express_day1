@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=account_circle" />
+
+    <style>
+        /* 기본 초기화 */
+        @font-face {
+            font-family: 'KboDiamondGothic';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_medium.woff') format('woff');
+            font-weight: 500;
+            font-display: swap;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0145f2, #3F3D56);
+        }
+
+        .login-container {
+            width: 350px;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-container h2 {
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .login-container input:focus {
+            border-color: #6C63FF;
+            outline: none;
+            box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #0145f2;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-container button:hover {
+            background-color: #574ED8;
+        }
+
+        .login-footer {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .login-footer a {
+            color: #6C63FF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            font-family: 'KboDiamondGothic';
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 1,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 100;
+            font-size: 70px;
+            margin-bottom: 30px;
+            margin-top: -10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="login-container">
+            <h2>로그인</h2>
+            <span class="material-symbols-outlined">
+                account_circle
+            </span>
+            <input v-model="userId" type="text" placeholder="아이디">
+            <input v-model="pwd" type="password" placeholder="비밀번호">
+            <button @click="fnLogin">로그인</button>
+            <div class="login-footer">
+                계정이 없으신가요? <a href="#">회원가입</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return { // 변수 선언
+                // 변수 - (key : value)
+                userId: "",
+                pwd: ""
+            };
+        },
+        methods: {
+            // 함수(메소드) - (key : function())
+            fnLogin: function () {
+                let self = this;
+                let param = {
+                    userId: self.userId,
+                    pwd: self.pwd
+                };
+                $.ajax({
+                    url: "http://localhost:3009/web/login",
+                    dataType: "json",
+                    type: "GET",
+                    data: param,
+                    success: function (data) { // 서버에서 보내준값은 data에 담겨온다
+                        console.log(data);
+                        if (data.length > 0) {
+                            // 로그인 성공
+                            alert(data[0].NICKNAME + "님 환영합니다.");
+                            sessionStorage.setItem("sessionId", data[0].USER_ID); // 아이디 보냄 key :sessionId, value:data[0].USER_ID
+                            sessionStorage.setItem("sessionStatus", data[0].STATUS); // 지위 보냄
+                            sessionStorage.setItem("sessionName", data[0].NICKNAME); // 닉네임 보냄
+                            
+                            location.href = "webmain.html";
+                        } else {
+                            // 로그인 실패
+                            alert("아이디/비밀번호를 확인해주세요.");
+                        }
+                    }
+                });
+            }
+        }, // methods
+        mounted() {
+            // 처음 시작할 때 실행되는 부분
+            let self = this;
+        }
+    });
+
+    app.mount('#app');
+</script>

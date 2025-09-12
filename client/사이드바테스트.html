@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가로 메뉴바 예제</title>
+<style>
+
+  /* 가로 메뉴바 */
+ .menu-bar {
+  display: flex;
+  /* background-color: #0145f2; */
+  padding: 10px;           /* 메뉴바 전체 패딩 */
+  gap: 10px;               /* 버튼 사이 간격 */
+}
+
+.menu-bar button {
+  flex: 1;
+  padding: 15px 0;
+  border: none;
+  background: #0145f2;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+  border-radius: 8px;      /* 둥근 모서리 */
+}
+
+.menu-bar button:hover,
+.menu-bar button.active {
+  background-color: #0131a2;
+}
+
+
+  /* 콘텐츠 영역 */
+  .content {
+    background-color: #f5f5f5;
+    padding: 20px;
+    
+  }
+
+  .content > div {
+    display: none;
+  }
+
+  .content > div.active {
+    display: block;
+  }
+
+</style>
+</head>
+<body>
+
+  <div class="menu-bar">
+    <button data-target="content1" class="active">메뉴 1</button>
+    <button data-target="content2">메뉴 2</button>
+    <button data-target="content3">메뉴 3</button>
+    <button data-target="content4">메뉴 4</button>
+    <button data-target="content5">메뉴 5</button>
+    <button data-target="content6">메뉴 6</button>
+    <button data-target="content7">메뉴 7</button>
+    <button data-target="content8">메뉴 8</button>
+    <button data-target="content9">메뉴 9</button>
+    <button data-target="content10">메뉴 10</button>
+  </div>
+
+  <div class="content">
+    <div id="content1" class="active">메뉴 1 내용</div>
+    <div id="content2">메뉴 2 내용</div>
+    <div id="content3">메뉴 3 내용</div>
+    <div id="content4">메뉴 4 내용</div>
+    <div id="content5">메뉴 5 내용</div>
+    <div id="content6">메뉴 6 내용</div>
+    <div id="content7">메뉴 7 내용</div>
+    <div id="content8">메뉴 8 내용</div>
+    <div id="content9">메뉴 9 내용</div>
+    <div id="content10">메뉴 10 내용</div>
+  </div>
+
+<script>
+  const buttons = document.querySelectorAll('.menu-bar button');
+  const contents = document.querySelectorAll('.content > div');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // 버튼 active 상태 변경
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // 콘텐츠 active 변경
+      const target = btn.getAttribute('data-target');
+      contents.forEach(c => {
+        c.id === target ? c.classList.add('active') : c.classList.remove('active');
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

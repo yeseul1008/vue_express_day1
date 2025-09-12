@@ -366,6 +366,56 @@ app.get('/board/info', async (req, res) => {
     res.status(500).send('Error executing query');
   }
 });
+
+
+///////개인프로젝트///////
+app.get('/web/login', async (req, res) => {
+  const { userId, pwd } = req.query;
+  let query = `SELECT * FROM USER_TBL WHERE USER_ID = '${userId}' AND PASSWORD = '${pwd}'`
+  try {
+    const result = await connection.execute(query);
+    const columnNames = result.metaData.map(column => column.name);
+
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    res.json(rows);
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
+  }
+});
+app.get('/web/list', async (req, res) => {
+  const { } = req.query;
+  try {
+    const result = await connection.execute(`SELECT * FROM WEBTOON_TBL`);
+    // console.log(result);
+    const columnNames = result.metaData.map(column => column.name);
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    // 리턴 (맵 형태로)
+    res.json({ // 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success",
+      webtoonlist: rows // 해당 이름으로 value를 보내줌
+    });
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
+  }
+});
 // 서버 시작
 app.listen(3009, () => {
   console.log('Server is running on port 3009');

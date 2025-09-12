@@ -82,6 +82,7 @@
                     data: { param },
                     success: function (data) { // 서버에서 보내준값은 data에 담겨온다
                         self.list = data.profList;
+                        console.log(self.list)
                     }
                 });
             },
