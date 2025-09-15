@@ -8,6 +8,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js"
         integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=account_circle" />
 
     <style>
         /* 기본 스타일 초기화 */
@@ -19,23 +21,15 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        @font-face {
-            font-family: 'KboDiamondGothic';
-            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_light.woff') format('woff');
-            font-weight: 300;
-            font-display: swap;
+        #content div {
+            font-family: 'JoseonGulim';
+            margin-bottom: 5px;
+            font-size: 17px;
         }
 
         @font-face {
-            font-family: 'KboDiamondGothic';
-            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_medium.woff') format('woff');
-            font-weight: 500;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: 'KboDiamondGothic';
-            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_bold.woff') format('woff');
+            font-family: 'YClover';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/YClover-Bold.woff2') format('woff2');
             font-weight: 700;
             font-display: swap;
         }
@@ -115,7 +109,7 @@
         }
 
         #blue-bar .title {
-            font-family: 'KboDiamondGothic';
+            font-family: 'YClover';
             color: #edf1f5;
             text-align: center;
 
@@ -168,8 +162,174 @@
                 font-size: 13px;
             }
         }
-        
-    
+
+        #content {
+            width: 80%;
+            /* 예: 전체 화면의 80% */
+            max-width: 1200px;
+            /* 너무 커지지 않도록 */
+            margin: 50px auto;
+            /* 위아래 50px, 좌우 가운데 */
+        }
+
+        .detail-container {
+            display: flex;
+            gap: 30px;
+            /* 좌우 박스 사이 여백 */
+        }
+
+        .webtoon-info {
+            flex: 1;
+            /* 왼쪽 영역 비율 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .webtoon-info .thumb {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .reviews {
+            flex: 2;
+            /* 오른쪽 영역 비율 */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .review {
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .review .date {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        /* 모바일 반응형: 세로로 쌓기 */
+        @media (max-width: 800px) {
+            .detail-container {
+                flex-direction: column;
+            }
+
+            .webtoon-info,
+            .reviews {
+                flex: unset;
+            }
+        }
+
+        .material-symbols-outlined {
+            /* 프로필 */
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+
+        .review .material-symbols-outlined {
+            vertical-align: middle;
+            /* 아이콘과 텍스트 수직 중앙 */
+        }
+
+        .nickname {
+            display: inline-block;
+            /* inline-block으로 만들기 */
+            vertical-align: middle;
+            /* 아이콘과 수직 중앙 맞춤 */
+            margin-left: 5px;
+            /* 아이콘과 띄우기 */
+        }
+
+        /* 별점 */
+        .webtoon-info .star {
+            font-size: 40px;
+            /* 기존 25px -> 40px로 키움 */
+            color: #ccc;
+            /* 기본 회색 별 */
+            display: inline-block;
+            float: none;
+            /* float 제거 */
+        }
+
+        .star {
+            font-size: 25px;
+            color: #ccc;
+            /* 기본 회색 별 */
+            display: inline-block;
+            position: relative;
+            float: right;
+        }
+
+        .webtoon-info .stars {
+            text-align: right;
+            /* 오른쪽 정렬 */
+        }
+
+        .star.filled {
+            color: #0145f2;
+            /* 꽉 찬 별 */
+        }
+
+        .star.half::before {
+            content: "★";
+            position: absolute;
+            left: 0;
+            width: 50%;
+            overflow: hidden;
+            color: #0145f2;
+            /* 반 별 */
+        }
+
+        .webtitle {
+            font-weight: bold;
+            font-size: 30px;
+        }
+
+        .webtoon-info {
+            border: #b6b6b671 solid 2px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            /* 버튼 간 간격 */
+        }
+
+        .reviewbutton {
+            font-family: 'JoseonGulim';
+            background-color: #edf1f5;
+            color: #0145f2;
+            padding: 15px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-left: 5px;
+            border: #0145f2 solid 2px;
+            margin: 0px auto;
+            margin-top: 20px;
+            font-size: 30px;
+        }
+
+        .reviewbutton:hover {
+            background-color: #b1b2b4;
+            color: #edf1f5;
+            border: #edf1f5 solid 2px;
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+        }
     </style>
 </head>
 
@@ -188,7 +348,7 @@
         </div>
 
         <div id="blue-bar">
-            <div class="title">웹사이트 이름</div>
+            <div class="title">툰플레이스</div>
             <div class="info">
                 <div v-if="!sessionUserId">
                     <div>리뷰 등록은 로그인 후 이용가능합니다 </div>
@@ -199,12 +359,62 @@
                     <div>등록한 리뷰 수:</div>
                 </div>
             </div>
-            <button class="reviewButton">리뷰추가</button>
+            <div class="button-group">
+                <button class="reviewButton" @click="addReview">리뷰추가</button>
+                <button class="reviewButton" @click="addwebtoon">웹툰추가</button>
+            </div>
         </div>
-        
 
-        <div class="content">
-           
+
+        <div id="content">
+            <div class="detail-container">
+                <!-- 왼쪽: 웹툰 정보 -->
+                <div class="webtoon-info">
+                    <img :src="info.THUMBNAIL_URL" alt="썸네일" class="thumb">
+                    <div class="webtitle">{{info.TITLE}}</div>
+                    <br>
+                    <div>작가: {{info.AUTHOR}}</div>
+                    <div>장르: {{info.GENRE}}</div>
+                    <div>플랫폼:
+                        <img v-if="info.PLATFORM === 1"
+                            src="https://i.pinimg.com/736x/29/2c/83/292c83d9246ae0052a87522c9280fc34.jpg" alt="네이버"
+                            style="width:20px; height:20px;">
+                        <img v-else-if="info.PLATFORM === 2"
+                            src="https://i.pinimg.com/736x/67/1a/32/671a326e5e28e4726b82e0d330ffc372.jpg" alt="카카오"
+                            style="width:20px; height:20px;">
+                        <img v-else-if="info.PLATFORM === 3"
+                            src="https://i.pinimg.com/736x/7d/6f/5c/7d6f5c9e89ffadca773ebf212b682a35.jpg" alt="레진"
+                            style="width:20px; height:20px;">
+                    </div>
+                    <div>{{info.SYNOPSIS}}</div>
+                    <br>
+                    <div>총 평점 {{info.AVG_RATING}}</div>
+                    <div class="stars">
+                        <span v-for="i in 5" :key="i" class="star"
+                            :class="{filled: info.AVG_RATING >= i, half: info.AVG_RATING >= i - 0.5 && info.AVG_RATING < i}">
+                            ★
+                        </span>
+                    </div>
+                    <div><button @click="addReview(webtoonId)" class="reviewbutton">리뷰 추가</button></div>
+                </div>
+
+                <!-- 오른쪽: 리뷰 영역 -->
+                <div class="reviews">
+                    <div class="review" v-for="review in reviewinfo">
+                        <span class="material-symbols-outlined">
+                            account_circle
+                        </span>
+                        <span class="nickname" style="font-family: 'JoseonGulim';">{{review.NICKNAME}}</span>
+                        <div>작성일: {{ review.CREATED_AT.slice(0,16).replace('T',' ') }}</div>
+                        <br>
+                        <div>{{review.CONTENTS}}</div>
+                        <span v-for="i in 5" :key="i" class="star" :class="{filled: review.RATING >= i,
+                               half: review.RATING >= i - 0.5 && review.RATING < i}">
+                            ★
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -220,7 +430,10 @@
             return {
                 webtoonList: [],
                 sessionUserId: "",
-                sessionName: ""
+                sessionName: "",
+                webtoonId: "",
+                info: {},
+                reviewinfo: [] // 리뷰목록
             };
         },
         methods: {
@@ -240,6 +453,50 @@
                     }
                 });
             },
+            // 웹툰 상세정보 불러오기
+            fnInfo: function () {
+                let self = this;
+                let param = { webtoonId: self.webtoonId };
+                $.ajax({
+                    url: "http://localhost:3009/web/info",
+                    dataType: "json",
+                    type: "GET",
+                    data: param,
+                    success: function (data) {
+                        console.log("웹툰 한개 정보 불러오기 성공")
+                        console.log(data);
+                        self.info = data.info;
+                    }
+                });
+            },
+            // 해당웹툰의 리뷰 불러오기
+            fnReviewInfo() {
+                const self = this;
+                $.ajax({
+                    url: "http://localhost:3009/web/reviewinfo",
+                    dataType: "json",
+                    type: "GET",
+                    data: { webtoonId: self.webtoonId },
+                    success: function (data) {
+                        console.log("웹툰 리뷰 정보 불러오기 성공", data);
+                        self.reviewinfo = data.reviewlist;
+                    }
+                });
+            },
+            addReview(webtoonId) {
+                if (!this.sessionUserId) {
+                    alert("리뷰 등록은 로그인 후 가능합니다");
+                    return;
+                }
+                window.location.href = `addreview.html?webtoonId=${webtoonId}`;
+            },
+            addwebtoon() {
+                if (!this.sessionUserId) {
+                    alert("리뷰 등록은 로그인 후 가능합니다");
+                    return;
+                }
+                window.location.href = `addwebtoon.html`;
+            },
             // 로그아웃
             fnLogout() {
                 if (confirm("로그아웃 하시겠습니까?")) {
@@ -250,14 +507,24 @@
                 }
             },
             // 상세 페이지 이동
-            
+
         },
         mounted() {
-            this.fnList();
+            let self = this;
+            self.fnList();
             this.sessionUserId = sessionStorage.getItem("sessionId");
             this.sessionName = sessionStorage.getItem("sessionName");
             console.log("세션 아이디:", this.sessionUserId);
             console.log("세션 닉네임:", this.sessionName);
+            // 클릭한 웹툰의 아이디 가져옴
+            const queryParams = new URLSearchParams(window.location.search);
+            self.webtoonId = queryParams.get('webtoonId') || '';
+
+            console.log("webtoonId:" + self.webtoonId);
+
+            self.fnInfo();
+
+            self.fnReviewInfo();
         }
     });
 

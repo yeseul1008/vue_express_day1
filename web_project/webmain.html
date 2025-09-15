@@ -20,22 +20,8 @@
         }
 
         @font-face {
-            font-family: 'KboDiamondGothic';
-            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_light.woff') format('woff');
-            font-weight: 300;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: 'KboDiamondGothic';
-            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_medium.woff') format('woff');
-            font-weight: 500;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: 'KboDiamondGothic';
-            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_bold.woff') format('woff');
+            font-family: 'YClover';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/YClover-Bold.woff2') format('woff2');
             font-weight: 700;
             font-display: swap;
         }
@@ -115,7 +101,7 @@
         }
 
         #blue-bar .title {
-            font-family: 'KboDiamondGothic';
+            font-family: 'YClover';
             color: #edf1f5;
             text-align: center;
 
@@ -147,6 +133,7 @@
             margin: 0px auto;
             margin-top: 20px;
             font-size: 30px;
+
         }
 
         #blue-bar button:hover {
@@ -154,6 +141,13 @@
             color: #edf1f5;
             border: #edf1f5 solid 2px;
             background: linear-gradient(135deg, #2575fc, #6a11cb);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            /* 버튼 간 간격 */
         }
 
         /* 반응형 처리 */
@@ -375,7 +369,7 @@
         </div>
 
         <div id="blue-bar">
-            <div class="title">웹사이트 이름</div>
+            <div class="title">툰플레이스</div>
             <div class="info">
                 <div v-if="!sessionUserId">
                     <div>리뷰 등록은 로그인 후 이용가능합니다 </div>
@@ -386,17 +380,20 @@
                     <div>등록한 리뷰 수:</div>
                 </div>
             </div>
-            <button class="reviewButton">리뷰추가</button>
+            <div class="button-group">
+                <button class="reviewButton" @click="addReview">리뷰추가</button>
+                <button class="reviewButton" @click="addwebtoon">웹툰추가</button>
+            </div>
         </div>
         <div class="menu-bar">
-            <button data-target="content1" class="active" value="전체">전체</button>
-            <button data-target="content2" value="로맨스">로맨스</button>
-            <button data-target="content3" value="판타지">판타지</button>
-            <button data-target="content4" value="코미디">코미디</button>
-            <button data-target="content5" value="드라마">드라마</button>
-            <button data-target="content6" value="일상">일상</button>
-            <button data-target="content7" value="스릴러">스릴러</button>
-            <button data-target="content8" value="액션">액션</button>
+            <button class="active" @click="filterByGenre('전체')">전체</button>
+            <button @click="filterByGenre('로맨스')">로맨스</button>
+            <button @click="filterByGenre('판타지')">판타지</button>
+            <button @click="filterByGenre('코미디')">코미디</button>
+            <button @click="filterByGenre('드라마')">드라마</button>
+            <button @click="filterByGenre('일상')">일상</button>
+            <button @click="filterByGenre('스릴러')">스릴러</button>
+            <button @click="filterByGenre('액션')">액션</button>
 
         </div>
 
@@ -420,7 +417,8 @@
                             style="width:20px; height:20px;">
                     </p>
                     <p>장르: {{ item.GENRE }}</p>
-                    <p>
+
+                    <p>평점: {{ item.AVG_RATING }}
                         <span v-for="i in 5" :key="i" class="star" :class="{filled: item.AVG_RATING >= i,
                                half: item.AVG_RATING >= i - 0.5 && item.AVG_RATING < i}">
                             ★
@@ -443,7 +441,8 @@
             return {
                 webtoonList: [],
                 sessionUserId: "",
-                sessionName: ""
+                sessionName: "",
+                selectedGenreFilter: "전체" //맨첨에 전체 웹툰 보여줌
             };
         },
         methods: {
@@ -463,6 +462,21 @@
                     }
                 });
             },
+            filterByGenre(genre) { //장르 선택
+                let self = this;
+                $.ajax({
+                    url: "http://localhost:3009/web/list",
+                    dataType: "json",
+                    type: "GET",
+                    data: { genre: genre }, // 선택한 장르 보내기
+                    success: function (data) {
+                        self.webtoonList = data.webtoonlist;
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    }
+                });
+            },
             // 로그아웃
             fnLogout() {
                 if (confirm("로그아웃 하시겠습니까?")) {
@@ -474,7 +488,22 @@
             },
             // 상세 페이지 이동
             goToDetail(webtoonId) {
-                window.location.href = `webtoonDetail.html?id=${webtoonId}`;
+                window.location.href = `webtoonDetail.html?webtoonId=${webtoonId}`;
+            },
+            //추가페이지 이동
+            addReview() {
+                if (!this.sessionUserId) {
+                    alert("리뷰 등록은 로그인 후 가능합니다");
+                    return;
+                }
+                window.location.href = `addreview.html`;
+            },
+            addwebtoon() {
+                if (!this.sessionUserId) {
+                    alert("웹툰 등록은 로그인 후 가능합니다");
+                    return;
+                }
+                window.location.href = `addwebtoon.html`;
             }
         },
         mounted() {

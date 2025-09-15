@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
+
+    <style>
+        /* 기본 스타일 초기화 */
+        * {
+
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        @font-face {
+            font-family: 'YClover';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/YClover-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'JoseonGulim';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunGu.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+
+        /* 로그인 바 */
+        #top-bar {
+            background-color: #edf1f5;
+            color: #fff;
+            height: 40px;
+            display: flex;
+            align-items: center;
+
+            /* 로그인 버튼 오른쪽 끝 */
+            padding: 0 20px;
+            font-size: 14px;
+            box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.288);
+            position: relative;
+            z-index: 10;
+        }
+
+        /*로그인, 회원가입 버튼*/
+        #top-bar button {
+            justify-content: flex-end;
+            font-family: 'JoseonGulim';
+            background-color: #fff;
+            color: #0145f2;
+            border: 2px solid #0145f2;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-left: 5px;
+        }
+
+
+        #top-bar button:hover {
+            background-color: #0145f2;
+            color: #edf1f5;
+        }
+
+        #ment {
+            text-align: left;
+            color: #0145f2;
+            flex-grow: 1;
+            font-family: 'JoseonGulim';
+            font-size: 20px;
+        }
+
+        /* 상단바 */
+        #blue-bar {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            /* 깔끔한 현대적 파란색 */
+            height: 230px;
+            font-size: 60px;
+            box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.548);
+            position: relative;
+            z-index: 5;
+            padding-top: 50px;
+            display: flex;
+            /* flex 컨테이너 */
+            flex-direction: column;
+            /* 위에서 아래로 쌓이도록 */
+            align-items: center;
+            /* 가로 중앙 정렬 */
+            padding-top: 50px;
+            /* 글씨 위 여백 */
+
+        }
+
+        #blue-bar .title {
+            font-family: 'YClover';
+            color: #edf1f5;
+            text-align: center;
+
+        }
+
+        #blue-bar .info {
+            margin-top: 15px;
+            color: #edf1f5;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        #blue-bar .info div {
+            font-family: 'JoseonGulim';
+            margin-bottom: 8px;
+        }
+
+        #blue-bar button {
+            font-family: 'JoseonGulim';
+            background-color: #edf1f5;
+            color: #0145f2;
+            padding: 15px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-left: 5px;
+            border: none;
+            margin: 0px auto;
+            margin-top: 20px;
+            font-size: 30px;
+        }
+
+        #blue-bar button:hover {
+            background-color: #b1b2b4;
+            color: #edf1f5;
+            border: #edf1f5 solid 2px;
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+        }
+
+        /* 반응형 처리 */
+        @media (max-width: 600px) {
+            .blue-bar {
+                font-size: 16px;
+                height: 50px;
+            }
+
+            .top-bar button {
+                padding: 4px 10px;
+                font-size: 13px;
+            }
+        }
+
+        #addbox {
+            margin: 30px auto;
+            width: 900px;
+            height: 770px;
+            border: #0145f2 solid 2px;
+            border-radius: 20px;
+            border: #b6b6b671 solid 2px;
+            padding: 30px;
+            background-color: #f9f9f9;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1),
+                0 4px 6px rgba(0, 0, 0, 0.08);
+            font-weight: bold;
+            gap: 30px;
+
+        }
+
+        #addbox .label {
+            font-family: 'JoseonGulim';
+            font-size: 23px;
+            margin-right: 30px;
+
+        }
+
+
+        #addbox input:not([type=radio]) {
+            width: 700px;
+            padding: 12px 15px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        input:hover {
+            border-color: #2575fc;
+        }
+
+        input:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 8px rgba(37, 117, 252, 0.5);
+        }
+
+        select {
+            width: 720px;
+            padding: 12px 15px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: #2575fc;
+        }
+
+        select:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 8px rgba(37, 117, 252, 0.5);
+        }
+
+        /* 별점 */
+        .rating {
+            display: flex;
+            gap: 8px;
+            font-size: 60px;
+            cursor: pointer;
+            justify-content: center;
+        }
+
+        .star {
+            color: #ccc;
+            /* 기본 회색 (비워진 별) */
+            transition: color 0.2s;
+        }
+
+        .star.filled {
+            color: gold;
+            /* 채워진 별 */
+        }
+
+        #addbox button {
+
+            font-family: 'JoseonGulim';
+            background-color: #edf1f5;
+            color: #0145f2;
+            border: #0145f2 solid 2px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-left: 5px;
+            font-size: 30px;
+        }
+
+        #addbox button:hover {
+            background-color: #b1b2b4;
+            color: #edf1f5;
+            border: #edf1f5 solid 2px;
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+        }
+
+        #addbox input[type=radio] {
+            width: auto;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="backcolor">
+            <div id="top-bar">
+                <div id="ment">웹툰 리뷰 통합 사이트</div>
+                <div v-if="!sessionUserId">
+                    <button>회원가입</button>
+                    <a href="login.html"><button>로그인</button></a>
+                </div>
+                <div v-else>
+                    <button>마이페이지</button>
+                    <button @click="fnLogout">로그아웃</button>
+                </div>
+            </div>
+
+            <div id="blue-bar">
+                <div class="title">툰플레이스</div>
+            </div>
+
+            <div id="addbox">
+                <div>
+                    <span class="label">웹툰 제목</span>
+                    <input v-model="selectedTitle" @input="checkDuplicate" style="width: 680px;">
+                    <!-- 이미 등록된 웹툰 메시지 -->
+                    <div v-if="isDuplicate" style="color: red; margin-top: 5px;">* 이미 등록된 웹툰입니다</div>
+                    <div v-else style="color: #0145f2;">사용가능한 웹툰명 입니다</div>
+                    </select>
+                </div>
+                <br>
+                <span class="label">작가명</span>
+                <input v-model="author">
+                <br>
+
+                <div>
+                    <span class="label" style="margin-right: 50px;">장르</span>
+                    <label style="margin-right: 20px;">
+                        <input type="radio" value="로맨스" v-model="selectedGenre">로맨스
+                    </label>
+                    <label style="margin-right: 20px;">
+                        <input type="radio" value="판타지" v-model="selectedGenre">판타지
+                    </label>
+                    <label style="margin-right: 20px;">
+                        <input type="radio" value="코미디" v-model="selectedGenre">코미디
+                    </label>
+                    <label style="margin-right: 20px;">
+                        <input type="radio" value="드라마" v-model="selectedGenre">드라마
+                    </label>
+                    <label style="margin-right: 20px;">
+                        <input type="radio" value="일상" v-model="selectedGenre">일상
+                    </label>
+                    <label style="margin-right: 20px;">
+                        <input type="radio" value="스릴러" v-model="selectedGenre">스릴러
+                    </label>
+                    <label style="margin-right: 20px;">
+                        <input type="radio" value="액션" v-model="selectedGenre">액션
+                    </label>
+                </div>
+                <br>
+                <span class="label">플랫폼</span>
+                <label style="margin-right: 20px;">
+                    <input type="radio" value="1" v-model="selectedform">네이버
+                </label>
+                <label style="margin-right: 20px;">
+                    <input type="radio" value="2" v-model="selectedform">카카오
+                </label>
+                <label style="margin-right: 20px;">
+                    <input type="radio" value="3" v-model="selectedform">레진코믹스
+                </label>
+                <br>
+                <br>
+                <span class="label">줄거리</span>
+                <input v-model="synopsis" style="height: 200px;">
+                <br>
+                <span class="label">웹툰표지</span>
+                <input v-model="thumbnail" placeholder="이미지 링크(URL)를 첨부하시오" style="width: 680px;">
+                <br>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button @click="fnAddWebtoon">웹툰추가</button>
+                    <button @click="fnback">뒤로가기</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</body>
+
+</html>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                webtoonList: [],
+                selectedTitle: "",//선택한 제목
+                author: "", // 작가명
+                sessionUserId: "", //유저아이디
+                sessionName: "", //유저닉네임
+                selectedGenre: "로맨스",//장르
+                selectedform: "1",//플랫폼
+                synopsis: "", // 줄거리
+                thumbnail: "", //썸네일
+
+                isDuplicate: false,   // 중복 여부 표시
+            };
+        },
+        watch: {
+            // 웹툰 ID가 바뀌면 제목도 자동으로 업데이트
+            selectedWebtoonId(newId) {
+                const webtoon = this.webtoonList.find(w => w.WEBTOON_ID === newId);
+                this.selectedTitle = webtoon ? webtoon.TITLE : "";
+            }
+        },
+        methods: {
+            // 웹툰 목록 불러오기
+            fnList() {
+                let self = this;
+                $.ajax({
+                    url: "http://localhost:3009/web/list",
+                    dataType: "json",
+                    type: "GET",
+                    success: function (data) {
+                        self.webtoonList = data.webtoonlist;
+                        console.log("웹툰 목록 불러오기 성공", self.webtoonList);
+                    },
+                    error: function (err) {
+                        console.error("웹툰 목록 불러오기 실패", err);
+                    }
+                });
+            },
+            fnAddWebtoon() { // 웹툰 추가
+                let self = this;
+                if (
+                    !self.selectedTitle ||
+                    !self.author ||
+                    !self.sessionUserId ||
+                    !self.sessionName ||
+                    !self.selectedGenre ||
+                    !self.selectedform ||
+                    !self.synopsis ||
+                    !self.thumbnail
+                ) {
+                    alert("모든 항목을 입력해주세요."); 
+                    return; // 하나라도 비어있으면 함수 종료
+                }
+                let param = {
+                    title: self.selectedTitle,
+                    author: self.author,
+                    genre: self.selectedGenre,
+                    form: self.selectedform,
+                    thumbnail: self.thumbnail,
+                    synopsis: self.synopsis
+                }
+                $.ajax({
+                    url: "http://localhost:3009/web/addwebtoon",
+                    dataType: "json",
+                    type: "GET",
+                    data: param,
+                    success: function (data) {
+                        console.log("웹툰추가 성공");
+                        alert("추가되었습니다")
+                        window.location.href = `webmain.html`;
+                    },
+                    error: function (err) {
+                        console.error("웹툰추가 실패", err);
+                    }
+                });
+            },
+            checkDuplicate() {
+                // 입력값과 기존 웹툰 제목에서 공백 제거
+                const inputNormalized = this.selectedTitle.replace(/\s/g, '');
+                this.isDuplicate = this.webtoonList.some(
+                    w => w.TITLE.replace(/\s/g, '') === inputNormalized
+                );
+            },
+            // 로그아웃
+            fnLogout() {
+                if (confirm("로그아웃 하시겠습니까?")) {
+                    sessionStorage.removeItem("sessionId");
+                    sessionStorage.removeItem("sessionStatus");
+                    alert("로그아웃 되었습니다!");
+                    location.href = "webmain.html";
+                }
+            },
+            fnback() {
+                window.location.href = `webmain.html`;
+            },
+            // 상세 페이지 이동
+            goToDetail(webtoonId) {
+                window.location.href = `webtoonDetail.html?webtoonId=${webtoonId}`;
+            },
+            setRating(star) {
+                this.rating = star; // 클릭하면 선택 확정
+            }
+        },
+        mounted() {
+            this.fnList();
+            this.sessionUserId = sessionStorage.getItem("sessionId");
+            this.sessionName = sessionStorage.getItem("sessionName");
+            console.log("세션 아이디:", this.sessionUserId);
+            console.log("세션 닉네임:", this.sessionName);
+        }
+    });
+
+    app.mount('#app');
+
+</script>
