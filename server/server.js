@@ -392,15 +392,28 @@ app.get('/web/login', async (req, res) => { //로그인
   }
 });
 app.get('/web/list', async (req, res) => {
-  const { genre } = req.query; // 클라이언트에서 genre 값 받기
+  const { genre, title } = req.query; // 클라이언트에서 genre와 title 값 받기
 
   try {
     let sql = `SELECT * FROM WEBTOON_TBL`;
     let binds = [];
+    let conditions = [];
 
+    // 장르 필터
     if (genre && genre !== "전체") {
-      sql += ` WHERE GENRE = :genre`; // 장르가 전체가 아니라면 필터링
+      conditions.push(`GENRE = :genre`);
       binds.push(genre);
+    }
+
+    // 제목 검색 필터
+    if (title && title.trim() !== "") {
+      conditions.push(`TITLE LIKE :title`);
+      binds.push(`%${title}%`);
+    }
+
+    // 조건이 하나라도 있으면 WHERE 추가
+    if (conditions.length > 0) {
+      sql += " WHERE " + conditions.join(" AND ");
     }
 
     const result = await connection.execute(sql, binds); // 바인딩
@@ -414,15 +427,13 @@ app.get('/web/list', async (req, res) => {
       return obj;
     });
 
-    res.json({
-      result: "success",
-      webtoonlist: rows
-    });
-  } catch (error) {
-    console.error('Error executing query', error);
-    res.status(500).send('Error executing query');
+    res.json({ webtoonlist: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
   }
 });
+
 
 app.get('/web/info', async (req, res) => { //웬툰 하나의 정보 가져오기
   const { webtoonId } = req.query;
@@ -452,7 +463,7 @@ app.get('/web/info', async (req, res) => { //웬툰 하나의 정보 가져오�
   }
 });
 app.get('/web/reviewinfo', async (req, res) => {// 특정 웹툰의 리뷰만 출력
-  const { webtoonId } = req.query; 
+  const { webtoonId } = req.query;
   try {
     const result = await connection.execute(
       `SELECT R.REVIEW_ID, R.USER_ID, R.WEBTOON_ID, R.RATING, R.CONTENTS, R.CREATED_AT, U.NICKNAME
@@ -460,7 +471,7 @@ app.get('/web/reviewinfo', async (req, res) => {// 특정 웹툰의 리뷰만 �
        INNER JOIN USER_TBL U ON R.USER_ID = U.USER_ID
        WHERE R.WEBTOON_ID = :id`,
       [Number(webtoonId)]
-      
+
     );
     console.log(result);
     const columnNames = result.metaData.map(c => c.name);
@@ -501,7 +512,7 @@ app.get('/web/addreview', async (req, res) => { //리뷰추가
   }
 });
 app.get('/web/addwebtoon', async (req, res) => { //리뷰추가
-  const { title, author, genre, form, thumbnail, synopsis} = req.query; // 파라미터 값 보내줌
+  const { title, author, genre, form, thumbnail, synopsis } = req.query; // 파라미터 값 보내줌
 
   try {
     await connection.execute(
@@ -515,6 +526,196 @@ app.get('/web/addwebtoon', async (req, res) => { //리뷰추가
   } catch (error) {
     console.error('Error executing insert', error);
     res.status(500).send('Error executing insert');
+  }
+});
+app.get('/web/myreview', async (req, res) => { //한 유저가 작성한리뷰 리스트 보냄
+  const { sessionUserId } = req.query;
+  try {
+    const result = await connection.execute(
+      `SELECT * FROM REVIEW_TBL R INNER JOIN WEBTOON_TBL W ON R.WEBTOON_ID = W.WEBTOON_ID WHERE USER_ID = :sessionUserId`,
+      [sessionUserId]
+    );
+    const columnNames = result.metaData.map(column => column.name);
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    // 리턴
+    res.json({
+      result: "success",
+      myreview: rows
+    });
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
+  }
+});
+app.get('/web/editreviewInfo', async (req, res) => { //리뷰 하나의 정보 가져오기
+  const { reviewid } = req.query;
+  try {
+    const result = await connection.execute(
+      `SELECT * FROM REVIEW_TBL WHERE REVIEW_ID = :reviewid`,
+      [reviewid]
+    );
+    const columnNames = result.metaData.map(column => column.name);
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    // 리턴
+    res.json({
+      result: "success",
+      info: rows[0]
+    });
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
+  }
+});
+
+app.get('/web/update', async (req, res) => {
+  const { contents, rating, reviewid } = req.query; // 파라미터 값 보내줌
+  try {
+    await connection.execute(
+      `UPDATE REVIEW_TBL SET CONTENTS = :contents, RATING = :rating WHERE REVIEW_ID = :reviewid`,
+      [contents, rating, reviewid], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+app.get('/web/userlist', async (req, res) => {
+  const { } = req.query;
+  try {
+    const result = await connection.execute(`SELECT * FROM USER_TBL`);
+    const columnNames = result.metaData.map(column => column.name);
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    // console.log(result);
+    // 리턴 (맵 형태로)
+    res.json({ // 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success",
+      userList: rows // 해당 이름으로 value를 보내줌
+    });
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
+  }
+});
+app.get('/web/useradd', async (req, res) => {
+  const { userId, pwd, nickname, mail, gender } = req.query; // 파라미터 값 보내줌
+  try {
+    await connection.execute(
+      `INSERT INTO USER_TBL VALUES(:userId, :pwd, :nickname, :mail, :gender, 'A')`,
+      [userId, pwd, nickname, mail, gender], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+app.get('/web/userdelete', async (req, res) => {
+  const { userId } = req.query; // 파라미터 값 보내줌
+
+  try {
+    await connection.execute(
+      `DELETE FROM USER_TBL WHERE USER_ID = :userId`,
+      [userId], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+app.get('/web/useredit', async (req, res) => { //유저정보 수정
+  const { afterId, afterpwd, afternickname, originalId} = req.query; // 파라미터 값 보내줌
+
+  try {
+    await connection.execute(
+      `UPDATE USER_TBL SET USER_ID = :afterId, PASSWORD = :afterpwd, NICKNAME = :afternickname WHERE USER_ID = :originalId`,
+      [afterId, afterpwd, afternickname, originalId], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+app.get('/web/webedit', async (req, res) => { //유저정보 수정
+  const { TITLE, AUTHOR, GENRE, PLATFORM, THUMBNAIL, originalId} = req.query; // 파라미터 값 보내줌
+
+  try {
+    await connection.execute(
+      `UPDATE WEBTOON_TBL SET TITLE = :TITLE, AUTHOR = :AUTHOR, GENRE = :GENRE, PLATFORM = :PLATFORM, THUMBNAIL = :THUMBNAIL WHERE WEBTOON_ID = :originalId`,
+      [ TITLE, AUTHOR, GENRE, PLATFORM, THUMBNAIL, originalId], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
+    );
+    res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
+      result: "success"
+    });
+  } catch (error) {
+    console.error('Error executing insert', error);
+    res.status(500).send('Error executing insert');
+  }
+});
+app.get('/web/userinfo', async (req, res) => { //유저 하나의 정보 가져오기
+  const { sessionUserId } = req.query;
+  try {
+    const result = await connection.execute(
+      `SELECT * FROM USER_TBL WHERE USER_ID = :sessionUserId`,
+      [sessionUserId]
+    );
+    const columnNames = result.metaData.map(column => column.name);
+    // 쿼리 결과를 JSON 형태로 변환
+    const rows = result.rows.map(row => {
+      // 각 행의 데이터를 컬럼명에 맞게 매핑하여 JSON 객체로 변환
+      const obj = {};
+      columnNames.forEach((columnName, index) => {
+        obj[columnName] = row[index];
+      });
+      return obj;
+    });
+    // 리턴
+    res.json({
+      result: "success",
+      info: rows[0]
+    });
+  } catch (error) {
+    console.error('Error executing query', error);
+    res.status(500).send('Error executing query');
   }
 });
 // 서버 시작

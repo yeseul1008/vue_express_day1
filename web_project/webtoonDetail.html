@@ -85,6 +85,7 @@
             flex-grow: 1;
             font-family: 'JoseonGulim';
             font-size: 20px;
+            cursor: pointer;
         }
 
         /* 상단바 */
@@ -266,7 +267,7 @@
             /* 기본 회색 별 */
             display: inline-block;
             position: relative;
-            float: right;
+            float: none;
         }
 
         .webtoon-info .stars {
@@ -283,10 +284,12 @@
             content: "★";
             position: absolute;
             left: 0;
+            top: 0;
+            /* 부모 기준으로 위치 */
             width: 50%;
+            /* 반만 색칠 */
             overflow: hidden;
             color: #0145f2;
-            /* 반 별 */
         }
 
         .webtitle {
@@ -336,13 +339,13 @@
 <body>
     <div id="app">
         <div id="top-bar">
-            <div id="ment">웹툰 리뷰 통합 사이트</div>
+            <div id="ment" @click="fnMain">웹툰 리뷰 통합 사이트</div>
             <div v-if="!sessionUserId">
-                <button>회원가입</button>
+                <a href="join.html"><button>회원가입</button></a>
                 <a href="login.html"><button>로그인</button></a>
             </div>
             <div v-else>
-                <button>마이페이지</button>
+                <button @click="goToMyPage">마이페이지</button>
                 <button @click="fnLogout">로그아웃</button>
             </div>
         </div>
@@ -356,7 +359,7 @@
                 </div>
                 <div v-else>
                     <div>닉네임: {{sessionName}} </div>
-                    <div>등록한 리뷰 수:</div>
+
                 </div>
             </div>
             <div class="button-group">
@@ -497,6 +500,9 @@
                 }
                 window.location.href = `addwebtoon.html`;
             },
+            goToMyPage() {
+                window.location.href = `mypage.html`;
+            },
             // 로그아웃
             fnLogout() {
                 if (confirm("로그아웃 하시겠습니까?")) {
@@ -506,6 +512,9 @@
                     location.href = "webmain.html";
                 }
             },
+            fnMain() {
+                window.location.href = `webmain.html`;
+            }
             // 상세 페이지 이동
 
         },

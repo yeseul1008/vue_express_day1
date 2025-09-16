@@ -7,7 +7,10 @@
     <title>Document</title>
     <script src="https://code.jquery.com/jquery-3.7.1.js"
         integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
+
 
     <style>
         /* 기본 스타일 초기화 */
@@ -77,6 +80,7 @@
             flex-grow: 1;
             font-family: 'JoseonGulim';
             font-size: 20px;
+            cursor: pointer;
         }
 
         /* 상단바 */
@@ -351,19 +355,29 @@
             color: #0145f2;
             /* 반 별 */
         }
+
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+    </style>
     </style>
 </head>
 
 <body>
     <div id="app">
         <div id="top-bar">
-            <div id="ment">웹툰 리뷰 통합 사이트</div>
+            <div id="ment" @click="fnMain">웹툰 리뷰 통합 사이트</div>
             <div v-if="!sessionUserId">
-                <button>회원가입</button>
+                <a href="join.html"><button>회원가입</button></a>
                 <a href="login.html"><button>로그인</button></a>
             </div>
             <div v-else>
-                <button>마이페이지</button>
+                <button v-if="sessionStatus === 'M'" @click="goToUserManage">회원관리</button>
+                <button v-else @click="goToMyPage">마이페이지</button>
                 <button @click="fnLogout">로그아웃</button>
             </div>
         </div>
@@ -377,7 +391,7 @@
                 </div>
                 <div v-else>
                     <div>닉네임: {{sessionName}} </div>
-                    <div>등록한 리뷰 수:</div>
+
                 </div>
             </div>
             <div class="button-group">
@@ -394,7 +408,10 @@
             <button @click="filterByGenre('일상')">일상</button>
             <button @click="filterByGenre('스릴러')">스릴러</button>
             <button @click="filterByGenre('액션')">액션</button>
-
+        </div>
+        <div class="search-bar" style="text-align:left; margin: 15px 15px;">
+            <input type="text" v-model="searchKeyword" placeholder="웹툰 제목 검색..." @input="filterByTitle"
+                style="padding: 8px 12px; width: 300px; border-radius: 8px; border: 1px solid #ccc; font-size:16px;">
         </div>
 
         <div class="content">
@@ -439,9 +456,12 @@
     const app = Vue.createApp({
         data() {
             return {
+                searchKeyword: "",
+
                 webtoonList: [],
                 sessionUserId: "",
                 sessionName: "",
+                sessionStatus: "",
                 selectedGenreFilter: "전체" //맨첨에 전체 웹툰 보여줌
             };
         },
@@ -477,6 +497,21 @@
                     }
                 });
             },
+            filterByTitle() { // 제목검색
+                let self = this;
+                $.ajax({
+                    url: "http://localhost:3009/web/list",
+                    dataType: "json",
+                    type: "GET",
+                    data: { title: self.searchKeyword }, // 검색 키워드 보내기
+                    success: function (data) {
+                        self.webtoonList = data.webtoonlist;
+                    },
+                    error: function (err) {
+                        console.error("검색 실패", err);
+                    }
+                });
+            },
             // 로그아웃
             fnLogout() {
                 if (confirm("로그아웃 하시겠습니까?")) {
@@ -504,14 +539,25 @@
                     return;
                 }
                 window.location.href = `addwebtoon.html`;
+            },
+            goToMyPage() {
+                window.location.href = `mypage.html`;
+            },
+            fnMain() {
+                window.location.href = `webmain.html`;
+            },
+            goToUserManage() {
+                window.location.href = `master.html`;
             }
         },
         mounted() {
             this.fnList();
             this.sessionUserId = sessionStorage.getItem("sessionId");
             this.sessionName = sessionStorage.getItem("sessionName");
+            this.sessionStatus = sessionStorage.getItem("sessionStatus");
             console.log("세션 아이디:", this.sessionUserId);
             console.log("세션 닉네임:", this.sessionName);
+            console.log("세션 상태:", this.sessionStatus);
         }
     });
 

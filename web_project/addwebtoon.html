@@ -265,6 +265,28 @@
             margin-right: 10px;
             vertical-align: middle;
         }
+
+        textarea {
+            width: 700px;
+            padding: 12px 15px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            resize: none;
+            /* 크기 조절 금지 */
+        }
+
+        textarea:hover {
+            border-color: #2575fc;
+        }
+
+        textarea:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 8px rgba(37, 117, 252, 0.5);
+        }
     </style>
 </head>
 
@@ -272,7 +294,7 @@
     <div id="app">
         <div id="backcolor">
             <div id="top-bar">
-                <div id="ment">웹툰 리뷰 통합 사이트</div>
+                <div id="ment" @click="fnMain">웹툰 리뷰 통합 사이트</div>
                 <div v-if="!sessionUserId">
                     <button>회원가입</button>
                     <a href="login.html"><button>로그인</button></a>
@@ -338,8 +360,12 @@
                 </label>
                 <br>
                 <br>
-                <span class="label">줄거리</span>
-                <input v-model="synopsis" style="height: 200px;">
+                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <span class="label" style="margin-right: 20px; min-width: 100px;">줄거리</span>
+                    <textarea v-model="synopsis"
+                        style="flex: 0 0 670px; height: 200px; padding: 12px; font-size: 16px; resize: none;"
+                        placeholder="내용을 입력하세요"></textarea>
+                </div>
                 <br>
                 <span class="label">웹툰표지</span>
                 <input v-model="thumbnail" placeholder="이미지 링크(URL)를 첨부하시오" style="width: 680px;">
@@ -412,7 +438,7 @@
                     !self.synopsis ||
                     !self.thumbnail
                 ) {
-                    alert("모든 항목을 입력해주세요."); 
+                    alert("모든 항목을 입력해주세요.");
                     return; // 하나라도 비어있으면 함수 종료
                 }
                 let param = {
@@ -463,6 +489,9 @@
             },
             setRating(star) {
                 this.rating = star; // 클릭하면 선택 확정
+            },
+            fnMain() {
+                window.location.href = `webmain.html`;
             }
         },
         mounted() {

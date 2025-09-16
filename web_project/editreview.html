@@ -293,7 +293,7 @@
                     <a href="login.html"><button>로그인</button></a>
                 </div>
                 <div v-else>
-                    <button>마이페이지</button>
+                    <button @click="fnMain">메인페이지</button>
                     <button @click="fnLogout">로그아웃</button>
                 </div>
             </div>
@@ -305,19 +305,15 @@
             <div id="addbox">
                 <div>
                     <span class="label">웹툰 제목</span>
-                    <select v-model="selectedWebtoonId" style="width: 700px;">
-                        <option value="" disabled>웹툰 제목을 선택하세요</option>
-                        <option v-for="webtoon in webtoonList" :key="webtoon.WEBTOON_ID" :value="webtoon.WEBTOON_ID">
-                            {{ webtoon.TITLE }}
-                        </option>
-                    </select>
+
+                    <input type="text" :value="selectedTitle" readonly style="width: 700px;" disabled>
+
                 </div>
                 <br>
                 <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                    <span class="label" style="margin-right: 20px; min-width: 100px;">한줄평</span>
-                    <textarea v-model="contentReview"
-                        style="width: 700px; height: 400px; resize: none; padding: 12px; font-size: 16px;"
-                        placeholder="1000자 이내로 입력하세요"></textarea>
+                    <span class="label" style="margin-right: 30px; min-width: 100px;">한줄평</span>
+                    <textarea v-model="contentReview" placeholder="1000자 이내로 입력하세요"
+                        style="width: 700px; height: 400px; resize: none; padding: 12px; font-size: 16px;"></textarea>
                 </div>
                 <div style="text-align: center;">
                     <div class="rating">
@@ -331,7 +327,7 @@
                     </div>
                     <div style="font-size: 20px;">선택한 별점: {{ rating }}</div>
                     <br>
-                    <button @click="fnAddReview">리뷰추가</button>
+                    <button @click="editreview">리뷰수정</button>
                     <button @click="fnback">뒤로가기</button>
                 </div>
 
@@ -358,7 +354,8 @@
                 rating: 0,       // 실제 저장되는 별점
                 hoverRating: 0,   // 마우스 올릴 때 미리보기
 
-                webtoonId: "" // 웹툰디테일창에서 리뷰추가 누른 경우
+                reviewid: '', // 수정하려고 선택한 리뷰의 아이디
+                info: ""
             };
         },
         watch: {
@@ -369,8 +366,7 @@
             }
         },
         methods: {
-            // 웹툰 목록 불러오기
-            fnList() {
+            fnList(callback) {
                 let self = this;
                 $.ajax({
                     url: "http://localhost:3009/web/list",
@@ -378,50 +374,45 @@
                     type: "GET",
                     success: function (data) {
                         self.webtoonList = data.webtoonlist;
-                        console.log("웹툰 목록 불러오기 성공", self.webtoonList);
-
-                        if (self.webtoonId) {
-                            const target = self.webtoonList.find(w => w.WEBTOON_ID === self.webtoonId);
-                            if (target) {
-                                self.selectedWebtoonId = target.WEBTOON_ID;
-                            }
-                        }
-                    },
-                    error: function (err) {
-                        console.error("웹툰 목록 불러오기 실패", err);
+                        if (callback) callback();
                     }
                 });
             },
-            fnAddReview() { // 리뷰 추가
+            // 리뷰 한개 불러오기
+            editreviewInfo: function () {
                 let self = this;
-                if (
-                    !this.selectedWebtoonId ||
-                    !this.selectedTitle ||
-                    !this.sessionUserId ||
-                    !this.sessionName ||
-                    !this.contentReview
-                ) {
-                    alert("모든 항목을 입력해주세요.");
-                    return; // 하나라도 비어있으면 함수 종료
-                }
-                let param = {
-                    sessionUserId: self.sessionUserId, //유저아이디
-                    selectedId: self.selectedWebtoonId, //선택웹툰 아이디
-                    rating: self.rating, //별점
-                    contentReview: self.contentReview
-                }
+                let param = { reviewid: self.reviewid };
                 $.ajax({
-                    url: "http://localhost:3009/web/addreview",
+                    url: "http://localhost:3009/web/editreviewInfo",
                     dataType: "json",
                     type: "GET",
                     data: param,
                     success: function (data) {
-                        console.log("리뷰추가 성공");
-                        alert("추가되었습니다")
-                        window.location.href = `webmain.html`;
-                    },
-                    error: function (err) {
-                        console.error("리뷰추가 실패", err);
+                        console.log("리뷰 한개 정보 불러오기 성공")
+                        console.log(data);
+
+
+                        self.selectedWebtoonId = data.info.WEBTOON_ID;
+                        self.contentReview = data.info.CONTENTS;
+                        self.rating = data.info.RATING;
+                    }
+                });
+            },
+            editreview() { //수정한거 업데이트
+                let self = this;
+                let param = {
+                    reviewid: self.reviewid, //수정할 리뷰 아이디
+                    contents: self.contentReview, //수정할 내용
+                    rating: self.rating // 수정할 별점
+                };
+                $.ajax({
+                    url: "http://localhost:3009/web/update",
+                    dataType: "json",
+                    type: "GET",
+                    data: param,
+                    success: function (data) {
+                        alert("리뷰가 수정되었습니다.")
+                        location.href = "mypage.html";
                     }
                 });
             },
@@ -435,7 +426,7 @@
                 }
             },
             fnback() {
-                window.location.href = `webmain.html`;
+                window.location.href = `mypage.html`;
             },
             // 상세 페이지 이동
             goToDetail(webtoonId) {
@@ -445,9 +436,9 @@
                 this.rating = star; // 클릭하면 선택 확정
             },
             fnMain() {
-                window.location.href = `webmain.html`;
-            },
-        },  
+                location.href = "webmain.html";
+            }
+        },
         mounted() {
 
             this.sessionUserId = sessionStorage.getItem("sessionId");
@@ -457,13 +448,14 @@
 
             // URL에서 webtoonId 가져오기
             const params = new URLSearchParams(window.location.search);
-            const idFromUrl = params.get('webtoonId');
-            if (idFromUrl) {
-                this.webtoonId = Number(idFromUrl); // 숫자로 변환
-            }
+            this.reviewid = params.get('reviewid');
+
 
             // 웹툰 목록 불러오기
-            this.fnList();
+            this.fnList(() => {
+                // 2. 목록 로딩 후 리뷰 정보 불러오기
+                if (this.reviewid) this.editreviewInfo();
+            });
         }
     });
 

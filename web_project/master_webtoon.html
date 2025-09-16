@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--vue js 불러오기-->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=account_circle" />
+
+    <style>
+        /* 기본 스타일 초기화 */
+        * {
+
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+        }
+
+        #content div {
+            font-family: 'JoseonGulim';
+            margin-bottom: 5px;
+            font-size: 17px;
+        }
+
+        @font-face {
+            font-family: 'YClover';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/YClover-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'JoseonGulim';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunGu.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+
+        /* 로그인 바 */
+        #top-bar {
+            background-color: #edf1f5;
+            color: #fff;
+            height: 40px;
+            display: flex;
+            align-items: center;
+
+            /* 로그인 버튼 오른쪽 끝 */
+            padding: 0 20px;
+            font-size: 14px;
+            box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.288);
+            position: relative;
+            z-index: 10;
+        }
+
+        /*로그인, 회원가입 버튼*/
+        #top-bar button {
+            justify-content: flex-end;
+            font-family: 'JoseonGulim';
+            background-color: #fff;
+            color: #0145f2;
+            border: 2px solid #0145f2;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-left: 5px;
+        }
+
+
+        #top-bar button:hover {
+            background-color: #0145f2;
+            color: #edf1f5;
+        }
+
+        #ment {
+            text-align: left;
+            color: #0145f2;
+            flex-grow: 1;
+            font-family: 'JoseonGulim';
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #box {
+            background: #fff;
+            /* 흰 배경 */
+            border-radius: 16px;
+            /* 둥근 모서리 */
+            padding: 20px;
+            /* 안쪽 여백 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.253);
+            /* 부드러운 그림자 */
+
+
+            width: 800px;
+            height: 700px;
+
+            margin: 50px auto;
+        }
+
+        /* 전체 레이아웃 */
+        .mypage-layout {
+            display: grid;
+            grid-template-rows: 80px 1fr;
+            grid-template-columns: 300px 1fr;
+            grid-template-areas:
+                "header header"
+                "sidebar content";
+            height: 100vh;
+            /* 화면 전체 차지 */
+            font-family: 'JoseonGulim';
+        }
+
+        /* 상단 프로필 헤더 */
+        .mypage-header {
+            grid-area: header;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            background: #4e73df;
+            color: #fff;
+        }
+
+        .mypage-header .profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .username {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .email {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .edit-btn {
+            background: #4e73df;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-left: 30px;
+
+        }
+
+        .edit-btn:hover {
+            background: #f1f1f1;
+        }
+
+        /* 사이드 메뉴 */
+        .mypage-sidebar {
+            grid-area: sidebar;
+            background: #f8f9fc;
+            padding: 20px;
+            border-right: 1px solid #e0e0e0;
+
+        }
+
+        .mypage-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mypage-sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .mypage-sidebar a {
+            display: block;
+            padding: 10px;
+            border-radius: 8px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .mypage-sidebar a:hover {
+            background: #e2e6f0;
+        }
+
+        /* 메인 콘텐츠 */
+        .mypage-content {
+            grid-area: content;
+            padding: 30px;
+            background: #fff;
+            overflow-y: auto;
+        }
+
+        .mypage-content h3 {
+            margin-bottom: 20px;
+            font-size: 25px;
+        }
+
+        .review-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 8px;
+
+
+        }
+
+        .review-item h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        .review-item p {
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .review-item .date {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        /* 반응형 (모바일) */
+        @media (max-width: 768px) {
+            .mypage-layout {
+                grid-template-rows: 80px auto auto;
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "header"
+                    "sidebar"
+                    "content";
+            }
+
+            .mypage-sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 1,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 100;
+            font-size: 70px;
+            position: relative;
+            right: 15px;
+            bottom: 10px;
+        }
+
+        .mypage-sidebar a.active {
+            background: #e2e6f0;
+        }
+
+        /* 별점 */
+        .star {
+            font-size: 25px;
+            color: #ccc;
+            /* 기본 회색 별 */
+            display: inline-block;
+            position: relative;
+            margin-right: 2px;
+            /* 별 간격 */
+            float: none;
+            /* 제거 */
+        }
+
+        .star.filled {
+            color: #0145f2;
+            /* 꽉 찬 별 */
+        }
+
+        .user-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        /* 개별 회원 카드 */
+        .user-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 회원 정보 */
+        .user-info p {
+            margin: 5px 0;
+            font-family: 'JoseonGulim', sans-serif;
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* 버튼 그룹 */
+        .user-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .user-actions button {
+            background-color: #0145f2;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .user-actions button:hover {
+            background-color: #0131a2;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+
+        .modal-body input {
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-buttons button:first-child {
+            background-color: #0145f2;
+            color: #fff;
+        }
+
+        .modal-buttons button:first-child:hover {
+            background-color: #0131a2;
+        }
+
+        .modal-buttons button:last-child {
+            background-color: #ccc;
+        }
+
+        .modal-buttons button:last-child:hover {
+            background-color: #999;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <div id="top-bar">
+                <div id="ment" @click="fnMain">웹툰 리뷰 통합 사이트</div>
+                <div v-if="!sessionUserId">
+                    <button>회원가입</button>
+                    <a href="login.html"><button>로그인</button></a>
+                </div>
+                <div v-else>
+                    <button @click="fnMain">메인페이지</button>
+                    <button @click="fnLogout">로그아웃</button>
+                </div>
+            </div>
+            <div class="mypage-layout">
+                <header class="mypage-header">
+                    <div class="profile-img">
+                        <span class="material-symbols-outlined">
+                            account_circle
+                        </span>
+                    </div>
+                    <div class="user-info">
+                        <h2 class="username">{{sessionName}}</h2>
+                        <p class="email"> 아이디: {{sessionUserId}}</p>
+                    </div>
+
+                </header>
+
+                <aside class="mypage-sidebar">
+                    <ul>
+                        <li><a href="master.html">
+                                회원 관리</a></li>
+                        <li><a href="#" :class="{ active: activeMenu === 'review' }">웹툰 관리</a></li>
+                    </ul>
+                </aside>
+
+                <main class="mypage-content">
+                    <h3>웹툰 관리</h3>
+                    <div class="user-list">
+                        <div class="user-card" v-for="item in webtoonList" :key="item.WEBTOON_ID">
+                            <div class="user-info">
+                                <img :src="item.THUMBNAIL_URL" alt="썸네일"
+                                    style="width:100%; height:150px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
+                                <p><strong>제목:</strong> {{item.TITLE}}</p>
+                                <p><strong>작가:</strong> {{item.AUTHOR}}</p>
+                                <p><strong>장르:</strong> {{item.GENRE}}</p>
+                                <p><strong>플랫폼:</strong>
+                                    {{ item.PLATFORM === 1 ? '네이버' : item.PLATFORM === 2 ? '카카오' : '레진' }}
+                                </p>
+                            </div>
+                            <div class="user-actions">
+                                <button @click="editWebtoon(item.WEBTOON_ID)">수정</button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- 모달창 -->
+                <div v-if="showModal" class="modal-overlay">
+                    <div class="modal-content">
+                        <h3>웹툰 정보 수정</h3>
+                        <br>
+                        <div class="modal-body">
+                            <p>
+                                <strong>제목:</strong>
+                                <input type="text" v-model="afterTitle">
+                            </p>
+                            <p>
+                                <strong>작가:</strong>
+                                <input type="text" v-model="afterAuthor">
+                            </p>
+                            <p>
+                                <strong>장르:</strong>
+                                <input type="text" v-model="afterGenre">
+                            </p>
+                            <p>
+                                <strong>플랫폼:</strong>
+                                <select v-model="afterPlatform">
+                                    <option value="1">네이버</option>
+                                    <option value="2">카카오</option>
+                                    <option value="3">레진</option>
+                                </select>
+                            </p>
+                            <p>
+                                <strong>썸네일 URL:</strong>
+                                <input type="text" v-model="afterThumbnail">
+                            </p>
+                        </div>
+                        <div class="modal-buttons">
+                            <button @click="updateWebtoon">저장</button>
+                            <button @click="showModal = false">취소</button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+
+</body>
+
+</html>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                webtoonList: [],
+                sessionUserId: "",
+                sessionName: "",
+                webtoonId: "",
+                info: {},
+                userList: [],
+                activeMenu: "review",
+                showModal: false,
+
+                originalId: "",
+                afterTitle: "",
+                afterAuthor: "",
+                afterGenre: "",
+                afterPlatform: "",
+                afterThumbnail: ""
+            };
+        },
+        methods: {
+            // 웹툰 목록 불러오기
+            fnList() {
+                let self = this;
+                $.ajax({
+                    url: "http://localhost:3009/web/list",
+                    dataType: "json",
+                    type: "GET",
+                    success: function (data) {
+                        self.webtoonList = data.webtoonlist;
+                        console.log("웹툰 목록 불러오기 성공", self.webtoonList);
+                    },
+                    error: function (err) {
+                        console.error("웹툰 목록 불러오기 실패", err);
+                    }
+                });
+            },
+            fnuserList() {// 유저 전체 불러오기
+                let self = this;
+                $.ajax({
+                    url: "http://localhost:3009/web/userlist",
+                    dataType: "json",
+                    type: "GET",
+                    success: function (data) {
+                        self.userList = data.userList;
+                        console.log("유저 목록 불러오기 성공", self.userList);
+                    },
+                    error: function (err) {
+                        console.error("유저 목록 불러오기 실패", err);
+                    }
+                });
+            },
+            deleteUser(userId) { //유저삭제
+                let self = this;
+                if (!confirm("정말 이 회원을 삭제하시겠습니까?")) {
+                    return; // 사용자가 취소를 눌렀을 때 실행 종료
+                }
+                $.ajax({
+                    url: "http://localhost:3009/web/userdelete",
+                    dataType: "json",
+                    type: "GET",
+                    data: { userId: userId },
+                    success: function (data) {
+                        alert("삭제되었습니다.");
+                        self.fnuserList();
+                    },
+                    error: function (err) {
+                        console.error("삭제 실패", err);
+                    }
+                });
+            },
+            editWebtoon(webtoonId) {
+                let webtoon = this.webtoonList.find(w => w.WEBTOON_ID === webtoonId);
+                if (webtoon) {
+                    this.originalId = webtoon.WEBTOON_ID;  // 수정 전 ID 저장
+                    this.afterTitle = webtoon.TITLE;
+                    this.afterAuthor = webtoon.AUTHOR;
+                    this.afterGenre = webtoon.GENRE;
+                    this.afterPlatform = webtoon.PLATFORM;
+                    this.afterThumbnail = webtoon.THUMBNAIL_URL;
+                    this.showModal = true; // 모달 열기
+                }
+            },
+            updateWebtoon() {
+                let self = this;
+                if (!confirm("정말 수정하시겠습니까?")) return;
+
+                $.ajax({
+                    url: "http://localhost:3009/web/webedit",
+                    dataType: "json",
+                    type: "GET",
+                    data: {
+                        originalId: self.originalId,
+                        TITLE: self.afterTitle,
+                        AUTHOR: self.afterAuthor,
+                        GENRE: self.afterGenre,
+                        PLATFORM: self.afterPlatform,
+                        THUMBNAIL: self.afterThumbnail
+                    },
+                    success: function (data) {
+                        alert("수정되었습니다.");
+                        self.fnList();
+                        self.showModal = false;
+                    },
+                    error: function (err) {
+                        console.error("수정 실패", err);
+                    }
+                });
+            },
+            updateUser() {//유저 정보 수정
+                let self = this;
+                if (!confirm("정말 수정하시겠습니까?")) {
+                    return; // 사용자가 취소를 눌렀을 때 실행 종료
+                }
+                $.ajax({
+                    url: "http://localhost:3009/web/useredit",
+                    dataType: "json",
+                    type: "GET",
+                    data: {
+                        originalId: self.originalId,
+                        afterId: self.afterId,
+                        afterpwd: self.afterpwd,
+                        afternickname: self.afternickname
+                    },
+                    success: function (data) {
+                        alert("수정되었습니다.");
+                        self.fnuserList();
+                        showModal = false;
+                    },
+                    error: function (err) {
+                        console.error("수정 실패", err);
+                    }
+                });
+            },
+            // 로그아웃
+            fnLogout() {
+                if (confirm("로그아웃 하시겠습니까?")) {
+                    sessionStorage.removeItem("sessionId");
+                    sessionStorage.removeItem("sessionStatus");
+                    alert("로그아웃 되었습니다!");
+                    location.href = "webmain.html";
+                }
+            },
+            fnEdit(reviewid) {
+                location.href = "editreview.html?reviewid=" + reviewid;
+            },
+            // 상세 페이지 이동
+            fnMain() {
+                location.href = "webmain.html";
+            },
+            fnMain() {
+                window.location.href = `webmain.html`;
+            }
+        },
+        mounted() {
+            let self = this;
+            self.fnList();
+            this.sessionUserId = sessionStorage.getItem("sessionId");
+            this.sessionName = sessionStorage.getItem("sessionName");
+            console.log("세션 아이디:", this.sessionUserId);
+            console.log("세션 닉네임:", this.sessionName);
+            // 클릭한 웹툰의 아이디 가져옴
+            const queryParams = new URLSearchParams(window.location.search);
+            self.webtoonId = queryParams.get('webtoonId') || '';
+
+
+            self.fnuserList();
+            self.fnList();
+        }
+    });
+
+    app.mount('#app');
+
+</script>
