@@ -405,6 +405,27 @@
         .modal-buttons button:last-child:hover {
             background-color: #999;
         }
+
+        .gender-box {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .gender-box strong {
+            margin-right: 10px;
+        }
+
+        .gender-box label {
+            margin-right: 20px;
+            /* 버튼 사이 간격 */
+            display: inline-block;
+        }
+
+        .gender-box input[type="radio"] {
+            margin-right: 5px;
+            accent-color: #0145f2;
+            /* 체크 색상 */
+        }
     </style>
 </head>
 
@@ -452,6 +473,7 @@
                                 <p><strong>아이디:</strong> {{item.USER_ID}}</p>
                                 <p><strong>닉네임:</strong> {{item.NICKNAME}}</p>
                                 <p><strong>비밀번호:</strong> {{item.PASSWORD}}</p>
+                                <p><strong>성별:</strong> {{ item.GENDER === 'M' ? '남자' : '여자' }}</p>
                             </div>
                             <div class="user-actions">
                                 <button @click="editUser(item.USER_ID)">수정</button>
@@ -478,6 +500,13 @@
                                 <strong>비밀번호:</strong>
                                 <input type="text" v-model="afterpwd">
                             </p>
+                            <div class="gender-box">
+                                <strong>성별:</strong>
+                                <label><input type="radio" name="aftergender" value="M" v-model="aftergender">
+                                    남자</label>
+                                <label><input type="radio" name="aftergender" value="F" v-model="aftergender">
+                                    여자</label>
+                            </div>
                         </div>
                         <div class="modal-buttons">
                             <button @click="updateUser">저장</button>
@@ -513,6 +542,7 @@
                 afterId: "",
                 afterpwd: "",
                 afternickname: "",
+                aftergender:"",
                 originalId: "" // 수정전아이디
             };
         },
@@ -574,6 +604,7 @@
                     this.afterId = user.USER_ID;
                     this.afternickname = user.NICKNAME;
                     this.afterpwd = user.PASSWORD;
+                    this.aftergender = user.GENDER,
                     this.showModal = true; // 모달 열기
                 }
             },
@@ -590,7 +621,8 @@
                         originalId: self.originalId,
                         afterId: self.afterId,
                         afterpwd: self.afterpwd,
-                        afternickname: self.afternickname
+                        afternickname: self.afternickname,
+                        aftergender: self.aftergender
                     },
                     success: function (data) {
                         alert("수정되었습니다.");

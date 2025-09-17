@@ -207,6 +207,15 @@
             border: 1px solid #ccc;
             border-radius: 8px;
             background-color: #f9f9f9;
+
+            word-wrap: break-word;
+            /* 긴 단어도 줄바꿈 */
+            white-space: pre-wrap;
+            /* 엔터와 공백 유지하며 줄바꿈 */
+            width: 100%;
+            /* 부모 영역에 맞게 */
+            box-sizing: border-box;
+            /* 패딩 포함 너비 계산 */
         }
 
         .review .date {

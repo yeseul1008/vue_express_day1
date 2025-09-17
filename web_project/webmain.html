@@ -15,7 +15,6 @@
     <style>
         /* 기본 스타일 초기화 */
         * {
-
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -318,11 +317,20 @@
             .webtoon-box {
                 flex-direction: column;
                 height: auto;
+                padding: 10px;
+                /* 카드 안쪽 여백 */
             }
 
             .webtoon-box .thumb {
-                width: 100%;
+                width: calc(100% - 20px);
+                /* 좌우 여백 고려 */
                 height: 200px;
+                /* 적절한 높이 */
+                object-fit: cover;
+                /* 이미지 비율 유지 */
+                border-radius: 15px;
+                margin: 10px;
+                /* 상하좌우 여백 */
             }
 
             .webtoon-box .info {
@@ -362,6 +370,79 @@
                 'wght' 400,
                 'GRAD' 0,
                 'opsz' 24
+        }
+
+        .sortbutton {
+            display: flex;
+            justify-content: flex-end;
+            /* 오른쪽 끝 정렬 */
+            gap: 10px;
+            /* 버튼 사이 간격 */
+            margin: 10px 20px;
+            /* 위/아래 여백, 오른쪽 약간 여유 */
+        }
+
+        .sortbutton button {
+            background: #0145f2;
+            /* 파란색 배경 */
+            color: #fff;
+            /* 흰색 글씨 */
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .sortbutton button:hover {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            /* 그라데이션 호버 */
+            transform: translateY(-2px);
+            /* 살짝 들어올리는 효과 */
+        }
+
+        .search-sort-container {
+            display: flex;
+            justify-content: space-between;
+            /* 검색창 왼쪽, 버튼 오른쪽 */
+            align-items: center;
+            margin: 15px 20px;
+            flex-wrap: wrap;
+            /* 화면 작아지면 버튼 아래로 내려가도록 */
+            gap: 10px;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            flex: 0.3;
+            /* 남은 공간 모두 사용 */
+            min-width: 200px;
+            /* 너무 작아지지 않게 */
+        }
+
+        .sortbutton {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sortbutton button {
+            background: #0145f2;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .sortbutton button:hover {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            transform: translateY(-2px);
         }
     </style>
     </style>
@@ -409,10 +490,15 @@
             <button @click="filterByGenre('스릴러')">스릴러</button>
             <button @click="filterByGenre('액션')">액션</button>
         </div>
-        <div class="search-bar" style="text-align:left; margin: 15px 15px;">
+        <div class="search-sort-container">
             <input type="text" v-model="searchKeyword" placeholder="웹툰 제목 검색..." @input="filterByTitle"
-                style="padding: 8px 12px; width: 300px; border-radius: 8px; border: 1px solid #ccc; font-size:16px;">
+                class="search-input">
+            <div class="sortbutton">
+                <button @click="sortByRatingDesc">별점 높은순</button>
+                <button @click="sortByRatingAsc">별점 낮은순</button>
+            </div>
         </div>
+
 
         <div class="content">
             <!-- DB에서 가져온 웹툰 목록 반복 -->
@@ -548,6 +634,15 @@
             },
             goToUserManage() {
                 window.location.href = `master.html`;
+            },
+
+            sortByRatingDesc() {
+                // 평균 평점 기준 내림차순
+                this.webtoonList.sort((a, b) => b.AVG_RATING - a.AVG_RATING);
+            },
+            sortByRatingAsc() {
+                // 평균 평점 기준 오름차순
+                this.webtoonList.sort((a, b) => a.AVG_RATING - b.AVG_RATING);
             }
         },
         mounted() {

@@ -658,12 +658,12 @@ app.get('/web/userdelete', async (req, res) => {
   }
 });
 app.get('/web/useredit', async (req, res) => { //유저정보 수정
-  const { afterId, afterpwd, afternickname, originalId} = req.query; // 파라미터 값 보내줌
+  const { afterId, afterpwd, afternickname, aftergender, originalId} = req.query; // 파라미터 값 보내줌
 
   try {
     await connection.execute(
-      `UPDATE USER_TBL SET USER_ID = :afterId, PASSWORD = :afterpwd, NICKNAME = :afternickname WHERE USER_ID = :originalId`,
-      [afterId, afterpwd, afternickname, originalId], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
+      `UPDATE USER_TBL SET USER_ID = :afterId, PASSWORD = :afterpwd, NICKNAME = :afternickname, GENDER = :aftergender WHERE USER_ID = :originalId`,
+      [afterId, afterpwd, afternickname, aftergender, originalId], // 변수 사용하는법1. 넣고자 하는 변수 이 리스트에 담고, 그후 :으로 위에서 호출
       { autoCommit: true } // 변수 사용하는법2. '${}' 사용해서 넣기
     );
     res.json({// 코드가 성공적으로 실행됐을때 이 코드를 보내줌
