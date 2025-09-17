@@ -285,14 +285,17 @@
             color: #0145f2;
             /* 꽉 찬 별 */
         }
-
+        .footer a{
+            font-size: 12px;
+            cursor: pointer;
+        }
        
     </style>
 </head>
 
 <body>
     <div id="app">
-        <div>
+        
             <div id="top-bar">
                 <div id="ment" @click="fnMain">웹툰 리뷰 통합 사이트</div>
                 <div v-if="!sessionUserId">
@@ -340,11 +343,13 @@
                         <span class="date" style="margin-left: 10px;">{{item.CREATED_AT.slice(0,16).replace('T',' ')}}</span>
                         <button class="edit-btn" @click="fnEdit(item.REVIEW_ID)">리뷰 수정</button>
                     </div>
+                    
                 </main>
             </div>
 
 
-        </div>
+        
+        
     </div>
 
 
