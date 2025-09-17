@@ -318,7 +318,7 @@
                     <a href="login.html"><button>로그인</button></a>
                 </div>
                 <div v-else>
-                    <button>마이페이지</button>
+                    <button @click="goToMyPage">마이페이지</button>
                     <button @click="fnLogout">로그아웃</button>
                 </div>
             </div>
@@ -524,6 +524,9 @@
             // 상세 페이지 이동
             goToDetail(webtoonId) {
                 window.location.href = `webtoonDetail.html?webtoonId=${webtoonId}`;
+            },
+            goToMyPage() {
+                window.location.href = `mypage.html`;
             },
             setRating(star) {
                 this.rating = star; // 클릭하면 선택 확정
