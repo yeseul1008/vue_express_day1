@@ -28,3 +28,9 @@
 | **버전 관리** | Git & GitHub |
 
 ## 페이지별 주요 기능
+### 1. 메인화면
+![메인화면](https://github.com/yeseul1008/vue_express_day1/blob/main/%EB%A9%94%EC%9D%B8%ED%99%94%EB%A9%B4.PNG)
+- 웹툰 리스트
+- 장르별 정렬/별점순 정렬
+- 웹툰명 검색 기능
+- 리뷰추가/웹툰추가 버튼
