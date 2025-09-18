@@ -1,7 +1,10 @@
 # 툰플레이스
 ![메인화면](https://github.com/yeseul1008/vue_express_day1/blob/main/%EB%A9%94%EC%9D%B8%ED%99%94%EB%A9%B4.PNG)
 > 웹툰 통합 별점&리뷰 플랫폼
-> 
+
+---
+
+
 ## 개설 목적
 네이버, 카카오, 레진코믹스 등등.. 수십개의 웹툰 플랫폼이 현재 존재하고있습니다. 하지만 모든 플랫폼들을 왔다갔다하며 무엇이 인기많은지, 어떤 리뷰가 달리는지 아는것은 매우 피곤할 것 입니다. 이러한 점을 보완하여 한 곳에 모아 모든 웹툰들에게 리뷰&별점을 달아줄 수 있는 사이트를 개설하였습니다. 
 
@@ -27,6 +30,10 @@
 | **Database** | Oracle |
 | **버전 관리** | Git & GitHub |
 
+
+---
+
+
 ## 페이지별 주요 기능
 ### 0. 로그인 & 회원가입
 | ![회원가입](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85.PNG) | ![로그인](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A1%9C%EA%B7%B8%EC%9D%B8.PNG) |
@@ -49,30 +56,42 @@
 - 웹툰 상세정보(제목, 작가, 장르, 플랫폼, 줄거리, 총 별점)
 - 사용자별 리뷰(평가, 별점)
 - 리뷰쓰기(바로 해당 웹툰명으로 선택되서 넘어감)
+- 페이징 기능
 
 ### 3. 리뷰 추가화면
 ![리뷰추가](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A6%AC%EB%B7%B0%EC%B6%94%EA%B0%80%ED%99%94%EB%A9%B4.PNG)
 - 제목 선택가능
 - 한줄평
 - 0~5 별점 선택 가능
+- 공란 발생시 등록 불가
 
-### 4 - 1. 마이페이지(작성리뷰)
+### 4. 웹툰 추가화면
+![웹툰추가](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EC%9B%B9%ED%88%B0%EC%B6%94%EA%B0%80%ED%99%94%EB%A9%B4.PNG)
+- 웹툰제목 중복검사
+- 작가명
+- 장르
+- 플랫폼
+- 줄거리
+- 웹툰 표지 첨부(직접 다운로드후 첨부할 필요 없이 url형색으로 첨부)
+- 공란 발생시 등록 불가
+
+### 5 - 1. 마이페이지(작성리뷰)
 ![작성리뷰](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EC%A7%80_%EB%A6%AC%EB%B7%B0.PNG)
 - 작성한 리뷰 한눈에 보기 가능
 - 리뷰수정 버튼(리뷰추가화면으로 리뷰 내용과 함께 넘어감)
 
 
-### 4 - 2. 마이페이지(사용자 정보 수정)
+### 5 - 2. 마이페이지(사용자 정보 수정)
 ![정보수정](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EC%A7%80_%EC%A0%95%EB%B3%B4.PNG)
 - 아이디 수정 (+ 중복확인)
 - 비밀번호 수정
 - 닉네임 수정
 - 성별 수정
 
-### 5 - 1. 회원관리(관리자 전용)
+### 6 - 1. 회원관리(관리자 전용)
 ![회원관리](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EC%A7%80_%ED%9A%8C%EC%9B%90_%EB%A7%88%EC%8A%A4%ED%84%B0.PNG)
 - 유저의 전체 정보 수정&삭제 가능
 
-### 5 - 2. 웹툰관리(관리자 전용)
+### 6 - 2. 웹툰관리(관리자 전용)
 ![웹툰관리](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EC%A7%80_%EC%9B%B9%ED%88%B0_%EB%A7%88%EC%8A%A4%ED%84%B0.PNG)
 - 웹툰의 정보 수정 가능 (제목명, 작가명, 장르, 플랫폼, 썸네일)
