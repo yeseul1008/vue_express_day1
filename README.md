@@ -36,6 +36,7 @@
 - 리뷰추가/웹툰추가 버튼
 
 ### 2. 웹툰 상세화면
-![웹툰상세화면](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EC%9B%B9%ED%88%B0%EC%83%81%EC%84%B8%ED%99%94%EB%A9%B4.PNG)
+![웹툰상세화면](https://github.com/yeseul1008/vue_express_day1/blob/main/%EC%9B%B9%ED%88%B0%EC%83%81%EC%84%B8%ED%99%94%EB%A9%B4.PNG)
 - 웹툰 상세정보(제목, 작가, 장르, 플랫폼, 줄거리, 총 별점)
 - 사용자별 리뷰(평가, 별점)
+- 리뷰쓰기(바로 해당 웹툰명으로 선택되서 넘어감)
