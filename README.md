@@ -29,6 +29,8 @@
 
 ## 페이지별 주요 기능
 ### 0. 로그인 & 회원가입
+| ![회원가입](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85.PNG) | ![로그인](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A1%9C%EA%B7%B8%EC%9D%B8.PNG) |
+|--------------------------|--------------------------|
 - 아이디 중복확인기능
 - 비밀번호 영어+숫자 포함해야하는 정규식 사용
 - 공란 존재하면 안됨
@@ -61,13 +63,16 @@
 
 
 ### 4 - 2. 마이페이지(사용자 정보 수정)
+![정보수정](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EC%A7%80_%EC%A0%95%EB%B3%B4.PNG)
 - 아이디 수정 (+ 중복확인)
 - 비밀번호 수정
 - 닉네임 수정
 - 성별 수정
 
 ### 5 - 1. 회원관리(관리자 전용)
+![회원관리](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EC%A7%80_%ED%9A%8C%EC%9B%90_%EB%A7%88%EC%8A%A4%ED%84%B0.PNG)
 - 유저의 전체 정보 수정&삭제 가능
 
 ### 5 - 2. 웹툰관리(관리자 전용)
+![웹툰관리](https://github.com/yeseul1008/vue_express_day1/blob/main/%EA%B0%9C%EC%9D%B8%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EC%A7%80_%EC%9B%B9%ED%88%B0_%EB%A7%88%EC%8A%A4%ED%84%B0.PNG)
 - 웹툰의 정보 수정 가능 (제목명, 작가명, 장르, 플랫폼, 썸네일)
