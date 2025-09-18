@@ -360,6 +360,44 @@
             font-size: 12px;
             cursor: pointer;
         }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            /* 버튼 사이 간격 */
+            margin: 20px 0;
+            font-family: 'JoseonGulim';
+        }
+
+        .pagination button {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background-color: #e0e0e0;
+        }
+
+        .pagination button:disabled {
+            background-color: #f9f9f9;
+            color: #bbb;
+            cursor: not-allowed;
+        }
+
+        .pagination button.active {
+            background-color: #4CAF50;
+            /* 메인 포인트 컬러 */
+            color: white;
+            font-weight: bold;
+            border-color: #4CAF50;
+        }
     </style>
 </head>
 
@@ -430,18 +468,29 @@
 
                 <!-- 오른쪽: 리뷰 영역 -->
                 <div class="reviews">
-                    <div class="review" v-for="review in reviewinfo">
-                        <span class="material-symbols-outlined">
-                            account_circle
-                        </span>
+                    <div class="review" v-for="review in paginatedReviews" :key="review.REVIEW_ID">
+                        <span class="material-symbols-outlined">account_circle</span>
                         <span class="nickname" style="font-family: 'JoseonGulim';">{{review.NICKNAME}}</span>
                         <div>작성일: {{ review.CREATED_AT.slice(0,16).replace('T',' ') }}</div>
                         <br>
                         <div>{{review.CONTENTS}}</div>
-                        <span v-for="i in 5" :key="i" class="star" :class="{filled: review.RATING >= i,
-                               half: review.RATING >= i - 0.5 && review.RATING < i}">
+                        <span v-for="i in 5" :key="i" class="star"
+                            :class="{filled: review.RATING >= i, half: review.RATING >= i - 0.5 && review.RATING < i}">
                             ★
                         </span>
+                    </div>
+
+                    <div class="pagination" style="text-align:center; margin-top:20px;">
+                        <button @click="currentPage--" :disabled="currentPage === 1">이전</button>
+
+                        <span v-for="page in totalPages" :key="page">
+                            <button @click="currentPage = page"
+                                :style="{fontWeight: currentPage === page ? 'bold' : 'normal'}">
+                                {{page}}
+                            </button>
+                        </span>
+
+                        <button @click="currentPage++" :disabled="currentPage === totalPages">다음</button>
                     </div>
                 </div>
             </div>
@@ -478,8 +527,21 @@
                 sessionName: "",
                 webtoonId: "",
                 info: {},
-                reviewinfo: [] // 리뷰목록
+                reviewinfo: [], // 리뷰목록
+
+                currentPage: 1,   // 현재 페이지
+                itemsPerPage: 4   // 한 페이지당 보여줄 리뷰 개수
             };
+        },
+        computed: {
+            paginatedReviews() {
+                const start = (this.currentPage - 1) * this.itemsPerPage;
+                const end = start + this.itemsPerPage;
+                return this.reviewinfo.slice(start, end);
+            },
+            totalPages() {
+                return Math.ceil(this.reviewinfo.length / this.itemsPerPage);
+            }
         },
         methods: {
             // 웹툰 목록 불러오기
@@ -576,6 +638,8 @@
             self.fnInfo();
 
             self.fnReviewInfo();
+
+
         }
     });
 
