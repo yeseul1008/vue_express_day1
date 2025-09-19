@@ -362,7 +362,8 @@
                 font-size: 24px;
             }
         }
-        .footer a{
+
+        .footer a {
             font-size: 12px;
             cursor: pointer;
         }
@@ -414,8 +415,13 @@
 
                         <div>
                             <label for="userid">아이디</label>
-                            <input type="text" id="userid" v-model="userid">
-                            <button type="button">중복확인</button>
+                            <input type="text" id="userid" v-model="userid" @input="idAvailable=false">
+
+                            <button type="button" @click="fnCheckId">중복확인</button>
+                        </div>
+
+                        <div v-if="idMessage" :style="{ color: idAvailable ? 'green' : 'red', marginTop:'6px' }">
+                            {{ idMessage }}
                         </div>
 
                         <div>
@@ -431,21 +437,16 @@
                         <div>
                             <label>성별</label>
                             <div class="radio-group">
-                                <input type="radio" id="male" value="M" v-model="gender">
-                                <label for="male">남</label>
-
-                                <input type="radio" id="female" value="F" v-model="gender">
-                                <label for="female">여</label>
+                                <input type="radio" id="male" value="M" v-model="gender"><label for="male">남</label>
+                                <input type="radio" id="female" value="F" v-model="gender"><label for="female">여</label>
                             </div>
                         </div>
+
                         <br>
                         <button @click="updateUser">수정하기</button>
                     </div>
                 </main>
-
             </div>
-
-
         </div>
     </div>
 
@@ -464,8 +465,9 @@
                 webtoonId: "",
                 info: {},
                 activeMenu: "review",
-
-
+                userList: [],
+                idAvailable: false,
+                idMessage: "",
                 userid: "",
                 pwd: "",
                 nickname: "",
@@ -473,30 +475,142 @@
             };
         },
         methods: {
+            // 사용자 정보 로드 (현재 로그인한 사용자 정보)
             userInfo: function () {
                 let self = this;
-                let param = { sessionUserId: self.sessionUserId };
+                const param = { sessionUserId: self.sessionUserId };
                 $.ajax({
                     url: "http://localhost:3009/web/userinfo",
                     dataType: "json",
                     type: "GET",
                     data: param,
                     success: function (data) {
-                        console.log("현재 유저정보 불러오기 성공")
-
-                        self.userid = data.info.USER_ID;
-                        self.pwd = data.info.PASSWORD;
-                        self.nickname = data.info.NICKNAME;
-                        self.gender = data.info.GENDER;
+                        console.log("현재 유저정보 불러오기 성공");
+                        if (data && data.info) {
+                            self.userid = data.info.USER_ID || "";
+                            self.pwd = data.info.PASSWORD || "";
+                            self.nickname = data.info.NICKNAME || "";
+                            self.gender = data.info.GENDER || "";
+                        }
+                    },
+                    error: function (err) {
+                        console.error("userinfo 호출 실패", err);
                     }
                 });
             },
-            // 회원정보수정
-            updateUser() {//유저 정보 수정
+
+            // 유저 전체 불러오기 (클라이언트측 검사용)
+            fnuserList() {
                 let self = this;
-                if (!confirm("정말 수정하시겠습니까?")) {
-                    return; // 사용자가 취소를 눌렀을 때 실행 종료
+                return $.ajax({
+                    url: "http://localhost:3009/web/userlist",
+                    dataType: "json",
+                    type: "GET",
+                    success: function (data) {
+                        self.userList = data.userList || [];
+                        console.log("유저 목록 불러오기 성공", self.userList);
+                    },
+                    error: function (err) {
+                        console.error("유저 목록 불러오기 실패", err);
+                        // 빈 배열로 유지
+                        self.userList = [];
+                    }
+                });
+            },
+
+            // 아이디 중복 확인 (클라이언트 목록 기반, 서버 검사 미리 지원)
+            fnCheckId() {
+                const self = this;
+                const toCheck = (self.userid || "").trim();
+                if (!toCheck) {
+                    this.idMessage = "아이디를 입력해주세요.";
+                    this.idAvailable = false;
+                    return;
                 }
+
+                // 본인 아이디와 동일하면 허용 (변경하지 않으면 문제 없음)
+                if (toCheck === self.sessionUserId) {
+                    this.idMessage = "현재 사용 중인 아이디입니다. (본인 아이디) — 사용 가능합니다.";
+                    this.idAvailable = true;
+                    return;
+                }
+
+                // userList가 비어있다면 먼저 불러온 다음 검사
+                if (!self.userList || self.userList.length === 0) {
+                    // fnuserList는 jqXHR(promise) 반환하므로 done에서 검사 실행
+                    this.fnuserList()
+                        .done(function () {
+                            // 검사 실행
+                            const exists = self.userList.some(u => u.USER_ID === toCheck);
+                            if (exists) {
+                                self.idMessage = "이미 존재하는 아이디입니다.";
+                                self.idAvailable = false;
+                            } else {
+                                self.idMessage = "사용 가능한 아이디입니다.";
+                                self.idAvailable = true;
+                            }
+                        })
+                        .fail(function () {
+                            self.idMessage = "서버에서 유저목록을 불러오지 못했습니다. (네트워크 오류)";
+                            self.idAvailable = false;
+                        });
+                } else {
+                    const exists = self.userList.some(u => u.USER_ID === toCheck);
+                    if (exists) {
+                        this.idMessage = "이미 존재하는 아이디입니다.";
+                        this.idAvailable = false;
+                    } else {
+                        this.idMessage = "사용 가능한 아이디입니다.";
+                        this.idAvailable = true;
+                    }
+                }
+            },
+
+            // (선택) 서버에서 직접 중복확인 API를 호출하는 방법 (추천: 보안/정확성 위해 서버 체크 병행)
+            fnCheckIdServer() {
+                const self = this;
+                const toCheck = (self.userid || "").trim();
+                if (!toCheck) {
+                    this.idMessage = "아이디를 입력해주세요.";
+                    this.idAvailable = false;
+                    return;
+                }
+                // 본인 아이디면 허용
+                if (toCheck === self.sessionUserId) {
+                    this.idMessage = "현재 사용 중인 아이디입니다. (본인 아이디) — 사용 가능합니다.";
+                    this.idAvailable = true;
+                    return;
+                }
+                $.ajax({
+                    url: "http://localhost:3009/web/checkId", // 서버에서 exists:true/false 반환하도록 구현해야 함
+                    type: "GET",
+                    dataType: "json",
+                    data: { userid: toCheck },
+                    success: function (res) {
+                        if (res && res.exists) {
+                            self.idMessage = "이미 존재하는 아이디입니다.";
+                            self.idAvailable = false;
+                        } else {
+                            self.idMessage = "사용 가능한 아이디입니다.";
+                            self.idAvailable = true;
+                        }
+                    },
+                    error: function (err) {
+                        console.error("서버 중복 확인 실패", err);
+                        self.idMessage = "중복 확인 실패(서버 오류)";
+                        self.idAvailable = false;
+                    }
+                });
+            },
+
+            // 회원정보수정
+            updateUser() {
+                let self = this;
+                if (!confirm("정말 수정하시겠습니까?")) return;
+                
+                if (self.userid !== self.sessionUserId && !self.idAvailable) 
+                { alert("아이디 중복확인을 해주세요."); return; }
+                
                 $.ajax({
                     url: "http://localhost:3009/web/useredit",
                     dataType: "json",
@@ -511,11 +625,8 @@
                     success: function (data) {
                         alert("수정되었습니다.");
                         self.userInfo();
-
                         sessionStorage.setItem("sessionId", self.userid);
                         sessionStorage.setItem("sessionName", self.nickname);
-
-                        // Vue 데이터도 반영
                         self.sessionUserId = self.userid;
                         self.sessionName = self.nickname;
                     },
@@ -524,6 +635,7 @@
                     }
                 });
             },
+
             // 로그아웃
             fnLogout() {
                 if (confirm("로그아웃 하시겠습니까?")) {
@@ -533,32 +645,24 @@
                     location.href = "webmain.html";
                 }
             },
-            fnEdit(reviewid) {
-                location.href = "editreview.html?reviewid=" + reviewid;
-            },
-            // 상세 페이지 이동
-            fnMain() {
-                window.location.href = `webmain.html`;
-            },
-            fnupdateme() {
-                window.location.href = `mypage_update.html`;
-            },
-            fnmypage() {
-                window.location.href = `mypage.html`;
-            }
+
+            fnEdit(reviewid) { location.href = "editreview.html?reviewid=" + reviewid; },
+            fnMain() { window.location.href = `webmain.html`; },
+            fnupdateme() { window.location.href = `mypage_update.html`; },
+            fnmypage() { window.location.href = `mypage.html`; }
         },
+
         mounted() {
             let self = this;
-
-            this.sessionUserId = sessionStorage.getItem("sessionId");
-            this.sessionName = sessionStorage.getItem("sessionName");
+            // 세션 정보 로드
+            this.sessionUserId = sessionStorage.getItem("sessionId") || "";
+            this.sessionName = sessionStorage.getItem("sessionName") || "";
             console.log("세션 아이디:", this.sessionUserId);
             console.log("세션 닉네임:", this.sessionName);
-            // 클릭한 웹툰의 아이디 가져옴
-            const queryParams = new URLSearchParams(window.location.search);
-            self.webtoonId = queryParams.get('webtoonId') || '';
 
-            self.userInfo();
+            // 현재 사용자 정보와 전체 유저 목록 미리 불러오기
+            this.userInfo();
+            this.fnuserList();
         }
     });
 
